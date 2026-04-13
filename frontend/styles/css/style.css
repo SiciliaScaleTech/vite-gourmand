@@ -1,0 +1,90 @@
+/* Variables pour réutiliser tes couleurs partout */
+:root {
+    --mimolette: #FFE699;
+    --cheddar: #ED9D36;
+    --dark: #212529;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Header & Nav */
+.navbar-custom {
+    background-color: var(--mimolette);
+}
+
+.nav-link.active {
+    color: var(--dark) !important;
+}
+
+.cart-icon {
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+
+/* Bannière Hero */
+.hero-banner {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1500');
+    background-size: cover;
+    background-position: center;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+/* Boutons */
+.btn-cheddar {
+    background-color: var(--cheddar);
+    color: white;
+    border: none;
+    transition: transform 0.2s;
+}
+
+.btn-cheddar:hover {
+    background-color: #d88c2d;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Cards & Menus */
+.card-menu {
+    border: none;
+    transition: box-shadow 0.3s;
+}
+
+.card-menu:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.text-cheddar {
+    color: var(--cheddar);
+}
+
+/* Section Avis (Scroll horizontal) */
+.testimonial-scroll {
+    overflow-x: auto;
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    scrollbar-width: thin; /* Pour Firefox */
+}
+
+.testimonial-card {
+    min-width: 300px;
+    border: none;
+}
+
+.bg-mimolette-light {
+    background-color: #fffcf2; /* Jaune très pâle pour les avis */
+    border-radius: 20px;
+}
+
+.testimonial-card {
+    min-width: 320px;
+    margin: 10px;
+}
