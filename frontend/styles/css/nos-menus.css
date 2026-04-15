@@ -1,0 +1,26 @@
+/* Force toutes les images des cards à avoir la même hauteur */
+.card-img-top {
+    height: 200px; /* Tu peux ajuster cette valeur selon tes goûts */
+    object-fit: cover; /* C'est LA propriété magique : elle recadre l'image sans la déformer */
+    width: 100%;
+}
+
+/* Optionnel : petit effet au survol pour rendre le site vivant */
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+
+.thumb-gallery {
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.thumb-gallery:hover {
+    border-color: #f7b733; /* Ta couleur Cheddar */
+    opacity: 0.8;
+}
