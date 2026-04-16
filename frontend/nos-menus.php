@@ -35,7 +35,7 @@
                     <a href="panier.php" class="cart-icon me-3 position-relative">
                         🛒<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger small">0</span>
                     </a>
-                    <a href="connexion.php" class="btn btn-dark rounded-pill px-4">Connexion 👤</a>
+                    <a href="connexion.php" class="btn btn-dark rounded-pill px-4">👤</a>
                 </div>
             </div>
         </nav>
@@ -184,143 +184,35 @@
         </div>
 
     </div>
-</main>
-
-<?php 
-$menus_details = [
-    'Noel' => [
-        'titre' => 'Menu de Noël gourmet',
-        'galerie' => ['assets/noel1-img-details.jpg', 'assets/noel2-img-detail.jpg', 'assets/noel3-img-detail.jpeg'],
-        'desc' => 'Un festin traditionnel avec foie gras maison et chapons farci.',
-        'plats' => ['Entrée: Foi gras', 'plat: Chapon aux marrons', 'Dessert: Bûche'],
-        'allergene' => 'Gluten, Fruits à coque',
-        'stock' => 5
-    ],
-    'Paques' => [
-        'titre' => 'Menu de Pâques',
-        'galerie' => ['assets/paque1-img-detail.webp', 'assets/paque2-img-detail.jpg', 'assets/paque3-img-detail.webp'],
-        'desc' => 'un superbe agneau pascal avec ses petite oeufs en chocolat',
-        'plats' => ['Entrée: Asperges', 'plat: Agneau pascale', 'Dessert: Gateau avec sa poule en chocolat'],
-        'allergene' => 'Lactose, oeufs',
-        'stock' => 12
-    ],
-    'Halloween' => [
-        'titre' => 'Menu d halloween',
-        'galerie' => ['assets/halloween1-img-detail.jpg', 'assets/halloween2-img-detail.jpg', 'assets/halloween3-img-detail.png'],
-        'desc' => 'Une déclinaisions de courges avec plusieurs saveurs mytérieuses a découvrir',
-        'plats' => ['Entrée: velouté de courge', 'plat: citrouille farcis', 'Dessert: citrouille avec son coulis mystère'],
-        'allergene' => 'neant',
-        'stock' => 8
-    ],
-     'Classique' => [
-        'titre' => 'Menu classique',
-        'galerie' => ['assets/classique1-img-detail.jpeg', 'assets/classique2-img-detail.webp', 'assets/classique3-img-detail.webp'],
-        'desc' => 'découvrez un plat avec ces tranches de boeuf accompagné de ses patates.',
-        'plats' => ['Entrée: salade et tomates cerises', 'plat: tranches de boeuf avec pomme de terre', 'Dessert: gateaux aux noix'],
-        'allergene' => 'arachide, noix',
-        'stock' => 17
-    ],
-     'Mariage' => [
-        'titre' => 'Menu de mariage',
-        'galerie' => ['assets/mariage1-img-detail.png', 'assets/mariage2-img-detail.jpeg', 'assets/mariage3-img-detail.jpg'],
-        'desc' => 'Découvrez nos bouchées gastronomique avec ses crevettes rose et son jambon sec.',
-        'plats' => ['Entrée: jambon sec/crevette rose', 'plat: roulés au jambon, galette de légumes, rôti', 'Dessert: pièce montée'],
-        'allergene' => 'crustacés',
-        'stock' => 20
-    ],
-    'Bapteme' => [
-        'titre' => 'Menu de bapteme',
-        'galerie' => ['assets/bapteme1-img-detail.jpg', 'assets/bapteme2-img-detail.jpg', 'assets/bapteme3-img-detail.webp'],
-        'desc' => 'un délicieux velouté de tomates avec des oeufs',
-        'plats' => ['Entrée: saumons sur toast', 'plat: velouté de tomate et roulés aux lard avec ses oeufs', 'Dessert: Cupcake'],
-        'allergene' => 'oeufs, saumon',
-        'stock' => 10
-    ],
-]
-?>
-
-
-
-<?php
-foreach ($menus_details as $id => $info) : ?>
-<div class="modal fade" id="modal<?php echo $id; ?>" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-mimolette border-0">
-                <h5 class="modal-title fw-bold"><?php echo $info['titre']; ?></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body p-4">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="main-img-container mb-3">
-                            <img src="<?php echo $info['galerie'][0]; ?>" 
-                                 id="mainImg<?php echo $id; ?>" 
-                                 class="img-fluid rounded-4 shadow-sm w-100" 
-                                 style="height: 300px; object-fit: cover;">
-                        </div>
-                        <div class="d-flex gap-2">
-                            <?php foreach($info['galerie'] as $img) : ?>
-                                <img src="<?php echo $img; ?>" 
-                                     class="img-thumbnail rounded-3 thumb-gallery" 
-                                     style="width: 80px; height: 60px; object-fit: cover; cursor: pointer;"
-                                     onclick="changeImg('<?php echo $id; ?>', '<?php echo $img; ?>')">
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <h6><strong>Au menu :</strong></h6>
-                        <ul class="small">
-                            <?php foreach($info['plats'] as $plat): ?>
-                                <li><?php echo $plat; ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                        <hr>
-                        <p class="small"><strong>Allergènes :</strong> <span class="text-danger"><?php echo $info['allergene']; ?></span></p>
-                        <p class="small"><strong>Stock :</strong> <?php echo $info['stock']; ?> restants</p>
-                    </div>
+</main><footer class="bg-dark text-white py-5 mt-5">
+        <div class="container text-center text-md-start">
+            <div class="row gy-4">
+                <div class="col-md-3">
+                    <h5 class="fw-bold text-cheddar">Vite & Gourmand</h5>
+                    <p class="small text-secondary">L'art de bien manger, cuisiné par Julie et livré par José.</p>
                 </div>
-            </div>
-            
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-cheddar rounded-pill w-100 fw-bold">Ajouter au panier</button>
-            </div>
-        </div>
+
+                <div class="col-md-3">
+        <h6 class="fw-bold text-white mb-3">Nos Horaires</h6>
+        <ul class="list-unstyled small text-secondary mx-auto mx-md-0" style="max-width: 200px;">
+            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
+                <span>Lundi</span> 
+                <span class="text-danger fw-bold">Fermé</span>
+            </li>
+            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
+                <span>Mar - Ven</span> 
+                <span>11h - 21h</span>
+            </li>
+            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
+                <span>Samedi</span> 
+                <span>10h - 22h</span>
+            </li>
+            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
+                <span>Dimanche</span> 
+                <span>10h - 15h</span>
+            </li>
+        </ul>
     </div>
-</div>
-<?php endforeach; ?>
-
-    <footer class="bg-dark text-white py-5 mt-5">
-    <div class="container text-center text-md-start">
-        <div class="row gy-4">
-            <div class="col-md-3">
-                <h5 class="fw-bold text-cheddar">Vite & Gourmand</h5>
-                <p class="small text-secondary">L'art de bien manger, cuisiné par Julie et livré par José.</p>
-            </div>
-
-            <div class="col-md-3">
-    <h6 class="fw-bold text-white mb-3">Nos Horaires</h6>
-    <ul class="list-unstyled small text-secondary mx-auto mx-md-0" style="max-width: 200px;">
-        <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-            <span>Lundi</span> 
-            <span class="text-danger fw-bold">Fermé</span>
-        </li>
-        <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-            <span>Mar - Ven</span> 
-            <span>11h - 21h</span>
-        </li>
-        <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-            <span>Samedi</span> 
-            <span>10h - 22h</span>
-        </li>
-        <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-            <span>Dimanche</span> 
-            <span>10h - 15h</span>
-        </li>
-    </ul>
-</div>
 
             <div class="col-md-3">
                 <h6 class="fw-bold text-white mb-3">Informations</h6>
@@ -338,11 +230,143 @@ foreach ($menus_details as $id => $info) : ?>
             </div>
         </div>
         <hr class="my-4 border-secondary">
-        <div class="text-center">
-            <p class="mb-0 small text-secondary">&copy; 2026 Vite & Gourmand - Tous droits réservés.</p>
+            <div class="text-center">
+                <p class="mb-0 small text-secondary">&copy; 2026 Vite & Gourmand - Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+<?php 
+$menus_details = [
+    'Noel' => [
+        'titre' => 'Menu de Noël gourmet',
+        'galerie' => ['assets/noel1-img-details.jpg', 'assets/noel2-img-detail.jpg', 'assets/noel3-img-detail.jpeg'],
+        'plats' => ['Entrée: Foi gras', 'plat: Chapon aux marrons', 'Dessert: Bûche'],
+        'prix_pers'   => 45,
+        'pers_min'    => 6,
+        'description' => 'Un festin traditionnel et chaleureux pour vos fêtes de fin d\'année.',
+        'conditions'  => 'Nécessite de commander 10 jours avant le réveillon.',
+        'allergene' => 'Gluten, Fruits à coque',
+        'stock' => 5
+    ],
+    'Paques' => [
+        'titre' => 'Menu de Pâques',
+        'galerie' => ['assets/paque1-img-detail.webp', 'assets/paque2-img-detail.jpg', 'assets/paque3-img-detail.webp'],
+        'plats' => ['Entrée: Asperges', 'plat: Agneau pascale', 'Dessert: Gateau avec sa poule en chocolat'],
+        'prix_pers'   => 38,
+        'pers_min'    => 4,
+        'description' => 'Célébrez le printemps avec des saveurs authentiques et de saison.',
+        'conditions'  => 'Commande possible jusqu\'à 5 jours avant.',
+        'allergene' => 'Lactose, oeufs',
+        'stock' => 12
+    ],
+    'Halloween' => [
+        'titre' => 'Menu d\'halloween',
+        'galerie' => ['assets/halloween1-img-detail.jpg', 'assets/halloween2-img-detail.jpg', 'assets/halloween3-img-detail.png'],
+        'plats' => ['Entrée: velouté de courge', 'plat: citrouille farcis', 'Dessert: citrouille avec son coulis mystère'],
+        'prix_pers'   => 40,
+        'pers_min'    => 6,
+        'description' => 'Célébrez halloween en famille ou entre amis avec des saveurs mystérieuse.',
+        'conditions'  => 'Commande possible jusqu\'à 8 jours avant.',
+        'allergene' => 'neant',
+        'stock' => 8
+    ],
+     'Classique' => [
+        'titre' => 'Menu classique',
+        'galerie' => ['assets/classique1-img-detail.jpeg', 'assets/classique2-img-detail.webp', 'assets/classique3-img-detail.webp'],
+        'plats' => ['Entrée: salade et tomates cerises', 'plat: tranches de boeuf avec pomme de terre', 'Dessert: gateaux aux noix'],
+        'prix_pers'   => 25,
+        'pers_min'    => 2,
+        'description' => 'Une repas équilibré qaund vous n\'avez pas eu le temps de cuisiner.',
+        'conditions'  => 'Commande possible jusqu\'à 3 jours avant.',
+        'allergene' => 'arachide, noix',
+        'stock' => 17
+    ],
+     'Mariage' => [
+        'titre' => 'Menu de mariage',
+        'galerie' => ['assets/mariage1-img-detail.png', 'assets/mariage2-img-detail.jpeg', 'assets/mariage3-img-detail.jpg'],
+        'plats' => ['Entrée: jambon sec/crevette rose', 'plat: roulés au jambon, galette de légumes, rôti', 'Dessert: pièce montée'],
+        'prix_pers'   => 60,
+        'pers_min'    => 20,
+        'description' => 'Une repas digne du plus beau jour de votre vie.',
+        'conditions'  => 'Commande possible jusqu\'à 1 mois avant.',
+        'allergene' => 'crustacés',
+        'stock' => 20
+    ],
+    'Bapteme' => [
+        'titre' => 'Menu de bapteme',
+        'galerie' => ['assets/bapteme1-img-detail.jpg', 'assets/bapteme2-img-detail.jpg', 'assets/bapteme3-img-detail.webp'],
+        'plats' => ['Entrée: saumons sur toast', 'plat: velouté de tomate et roulés aux lard avec ses oeufs', 'Dessert: Cupcake'],
+        'prix_pers'   => 30,
+        'pers_min'    => 15,
+        'description' => 'Un jour important pour vous et votre enfant, laissez nous préparer votre repas pour profiter pleinement de ce jour si particulier.',
+        'conditions'  => 'Commande possible jusqu\'à 3 semaines avant.',
+        'allergene' => 'oeufs, saumon',
+        'stock' => 10
+    ],
+]
+?>
+
+
+<?php
+foreach ($menus_details as $id => $info) : ?>
+<div class="modal fade" id="modal<?php echo $id; ?>" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-mimolette border-0">
+                <h5 class="modal-title fw-bold"><?php echo $info['titre']; ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="main-img-container mb-3">
+                <img src="<?php echo $info['galerie'][0]; ?>" id="mainImg<?php echo $id; ?>" class="img-fluid rounded-4 shadow-sm w-100" style="height: 250px; object-fit: cover;">
+            </div>
+            <div class="d-flex gap-2">
+                <?php foreach($info['galerie'] as $img) : ?>
+                    <img src="<?php echo $img; ?>" class="img-thumbnail rounded-3 thumb-gallery" style="width: 60px; height: 45px; object-fit: cover; cursor: pointer;" onclick="changeImg('<?php echo $id; ?>', '<?php echo $img; ?>')">
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h6 class="fw-bold">Description :</h6>
+            <p class="small text-muted"><?php echo $info['description']; ?></p>
+            
+            <h6 class="fw-bold mt-3">Composition :</h6>
+            <ul class="small mb-3">
+                <?php foreach($info['plats'] as $plat): ?>
+                    <li><?php echo $plat; ?></li>
+                <?php endforeach; ?>
+            </ul>
+
+            <div class="bg-light p-3 rounded-3">
+                <p class="small mb-1"><strong>👥 Personnes minimum :</strong> <?php echo $info['pers_min']; ?></p>
+                <p class="small mb-1"><strong>🕒 Conditions :</strong> <?php echo $info['conditions']; ?></p>
+                <p class="small mb-0"><strong>⚠️ Allergènes :</strong> <span class="text-danger"><?php echo $info['allergene']; ?></span></p>
+            </div>
         </div>
     </div>
-</footer>
+</div>
+
+<div class="modal-footer border-0 bg-mimolette-light py-3">
+    <div class="d-flex justify-content-between align-items-center w-100 px-3">
+        <div>
+            <span class="text-muted small">Total pour <?php echo $info['pers_min']; ?> pers. min :</span>
+            <h4 class="fw-bold text-cheddar mb-0">
+                <?php echo ($info['prix_pers'] * $info['pers_min']); ?> €
+            </h4>
+        </div>
+        <button type="button" class="btn btn-cheddar rounded-pill px-4 fw-bold shadow-sm">
+            Réserver ce menu
+        </button>
+    </div>
+</div>
+<?php endforeach; ?>
+
+  
     <script src="styles/script/nos-menus.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
