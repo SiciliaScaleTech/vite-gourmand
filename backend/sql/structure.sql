@@ -62,3 +62,23 @@ CREATE TABLE composer(
    FOREIGN KEY(id_menu) REFERENCES menu(id_menu) ON DELETE CASCADE,
    FOREIGN KEY(id_plat) REFERENCES plats(id_plat) ON DELETE CASCADE
 );
+
+-- Table pour les Avis (présente sur ton diagramme)
+CREATE TABLE IF NOT EXISTS avis (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    note INT CHECK (note BETWEEN 1 AND 5),
+    statut VARCHAR(50) DEFAULT 'en attente',
+    menu_id INT,
+    FOREIGN KEY (menu_id) REFERENCES menu(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Table pour les Messages de contact (Celle qu'on a ajoutée pour ta branche)
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100),
+    email VARCHAR(150) NOT NULL,
+    sujet VARCHAR(255),
+    message TEXT NOT NULL,
+    date_envoi DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
