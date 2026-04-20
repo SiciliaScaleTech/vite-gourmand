@@ -1,57 +1,18 @@
 <?php
+// 1. On appelle le header (qui fait le session_start)
+include 'includes/header.php';
+
+// 2. On appelle la config BDD
 require_once '../backend/config.php';
 
+// 3. On récupère les menus UNIQUEMENT pour cette page
 try {
-    // On ajoute 'pers_min' pour que le filtre JS puisse l'utiliser
     $query = $pdo->query("SELECT id, nom_technique, titre, description, galerie, prix_pers, pers_min FROM menu ORDER BY id ASC");
     $menus = $query->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("Erreur : " . $e->getMessage());
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite & Gourmand | Nos menus</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles/css/style.css">
-    <link rel="stylesheet" href="styles/css/nos-menus.css">
-</head>
-<body>
-
-    <header class="navbar-custom sticky-top shadow-sm">
-        <nav class="navbar navbar-expand-lg">
-            <div class="container">
-                <a class="navbar-brand" href="index.php">
-                    <img src="assets/Logo-Vite&Gourmand.png" alt="Logo" width="70">
-                </a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item"><a class="nav-link" href="index.php">Accueil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="nos-menus.php">Menus</a></li>
-                        <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
-                    </ul>
-                </div>
-
-                <div class="d-flex align-items-center">
-                    <a href="panier.php" class="cart-icon me-3 position-relative">
-                        🛒<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger small">0</span>
-                    </a>
-                    <a href="connexion.php" class="btn btn-dark rounded-pill px-4">👤</a>
-                </div>
-            </div>
-        </nav>
-    </header>
 
         <section class="hero-banner text-center">
             <div class="container">
@@ -150,57 +111,9 @@ try {
 </div>
     
 </main>
-    <footer class="bg-dark text-white py-5 mt-5">
-        <div class="container text-center text-md-start">
-            <div class="row gy-4">
-                <div class="col-md-3">
-                    <h5 class="fw-bold text-cheddar">Vite & Gourmand</h5>
-                    <p class="small text-secondary">L'art de bien manger, cuisiné par Julie et livré par José.</p>
-                </div>
+    <script src="styles/script/nos-menus.js"></script>
+    <?php include 'includes/footer.php'; ?>
 
-                <div class="col-md-3">
-        <h6 class="fw-bold text-white mb-3">Nos Horaires</h6>
-        <ul class="list-unstyled small text-secondary mx-auto mx-md-0" style="max-width: 200px;">
-            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-                <span>Lundi</span> 
-                <span class="text-danger fw-bold">Fermé</span>
-            </li>
-            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-                <span>Mar - Ven</span> 
-                <span>11h - 21h</span>
-            </li>
-            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-                <span>Samedi</span> 
-                <span>10h - 22h</span>
-            </li>
-            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-                <span>Dimanche</span> 
-                <span>10h - 15h</span>
-            </li>
-        </ul>
-    </div>
-
-            <div class="col-md-3">
-                <h6 class="fw-bold text-white mb-3">Informations</h6>
-                <ul class="list-unstyled d-flex flex-column gap-2">
-                    <li><a href="#" class="text-white-50 text-decoration-none small">Mentions Légales</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none small">Politique de cookies</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none small">CGU</a></li>
-                </ul>
-            </div>
-
-            <div class="col-md-3 text-secondary small">
-                <h6 class="fw-bold text-white mb-3">Contact</h6>
-                <p class="mb-1">julie@vite-gourmand.fr</p>
-                <p> José : 06.69.25.58.47</p>
-            </div>
-        </div>
-        <hr class="my-4 border-secondary">
-            <div class="text-center">
-                <p class="mb-0 small text-secondary">&copy; 2026 Vite & Gourmand - Tous droits réservés.</p>
-            </div>
-        </div>
-    </footer>
 
 <?php 
 $menus_details = [
@@ -333,7 +246,4 @@ foreach ($menus_details as $id => $info) : ?>
 <?php endforeach; ?>
 
   
-    <script src="styles/script/nos-menus.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    

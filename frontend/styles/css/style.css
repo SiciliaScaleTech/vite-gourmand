@@ -6,8 +6,20 @@
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
     font-family: 'Poppins', sans-serif;
     background-color: #f8f9fa;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+footer {
+    flex-shrink: 0;
 }
 
 /* Header & Nav */
@@ -87,4 +99,21 @@ body {
 .testimonial-card {
     min-width: 320px;
     margin: 10px;
+}
+
+.alert-cheddar {
+    background-color: #ffb703; /* Ton orange/jaune principal */
+    color: #1a1a1a;            /* Texte sombre pour le contraste */
+    border-left: 5px solid #fb8500; /* Une petite barre plus foncée sur le côté */
+    border-radius: 15px;       /* Des bords arrondis pour rester dans ton style "Gourmand" */
+}
+
+/* On stylise aussi le lien à l'intérieur */
+.alert-cheddar a {
+    color: #000;
+    text-decoration: underline;
+}
+
+.alert-cheddar a:hover {
+    color: #fb8500;
 }
