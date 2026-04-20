@@ -1,9 +1,21 @@
+<?php
+require_once '../backend/config.php';
+
+try {
+    // On ajoute 'pers_min' pour que le filtre JS puisse l'utiliser
+    $query = $pdo->query("SELECT id, nom_technique, titre, description, galerie, prix_pers, pers_min FROM menu ORDER BY id ASC");
+    $menus = $query->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Erreur : " . $e->getMessage());
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite & Gourmand | Accueil</title>
+    <title>Vite & Gourmand | Nos menus</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
@@ -25,9 +37,9 @@
 
                 <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                     <ul class="navbar-nav">
-                        <li class="nav-item"><a class="nav-link active fw-bold" href="index.php">Accueil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="menus.php">Menus</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" href="index.php">Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="nos-menus.php">Menus</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
                     </ul>
                 </div>
 
@@ -91,100 +103,54 @@
             </div>
             <div class="col-12 text-center mt-4">
                 <button type="button" onclick="filterMenus()" class="btn btn-cheddar rounded-pill px-5 fw-bold shadow">
-                    Actualiser les menus 
+                    Actualiser les menus
                 </button>
             </div>
         </form>
     </section>
 
-    <div class="row g-4" id="menusContainer">
+    <div class="container my-5">
+    <h1 class="text-center mb-5">Nos Menus</h1>
+
+    <div class="row g-4" id="menu-container">
+        <?php foreach ($menus as $menu): 
+            $galerie = explode('|', $menu['galerie']);
+            $imageVignette = $galerie[0];
+        ?>
         
-        <div class="col-md-4 menu-item" data-theme="Noel">
-            <div class="card h-100 shadow-sm border-0 card-hover">
-                <img src="assets/noel-img-menu.jpg" class="card-img-top rounded-top" alt="Noël">
-                <div class="card-body">
-                    <h5 class="fw-bold">Menu de Noël</h5>
-                    <p class="text-muted small">Tradition et féerie avec notre chapon farci.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-cheddar">45€ / pers.</span>
-                        <button class="btn btn-outline-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalNoel">Détails</button>
+        <div class="col-md-4 menu-item" 
+             data-theme="<?= $menu['nom_technique'] ?>" 
+             data-prix="<?= $menu['prix_pers'] ?>"
+             data-pers-min="<?= $menu['pers_min'] ?>">
+
+            <div class="card h-100 shadow-sm border-0">
+                <img src="<?= $imageVignette ?>" class="card-img-top" alt="<?= $menu['titre'] ?>" style="height: 220px; object-fit: cover;">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold"><?= $menu['titre'] ?></h5>
+                    <p class="card-text text-muted flex-grow-1">
+                        <?= mb_strimwidth($menu['description'], 0, 100, "...") ?>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="h5 mb-0 text-primary"><?= $menu['prix_pers'] ?>€ <small class="text-muted fs-6">/ pers</small></span>
+                        <a href="details-menu.php?id=<?= $menu['id'] ?>" class="btn btn-outline-primary">Voir le détail</a>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4 menu-item" data-theme="Paques">
-            <div class="card h-100 shadow-sm border-0 card-hover">
-                <img src="assets/paque-img-menu.jpg" class="card-img-top rounded-top" alt="Pâques">
-                <div class="card-body">
-                    <h5 class="fw-bold">Menu de Pâques</h5>
-                    <p class="text-muted small">L'agneau de sept heures et ses douceurs chocolatées.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-cheddar">38€ / pers.</span>
-                        <button class="btn btn-outline-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalPaques">Détails</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 menu-item" data-theme="Halloween">
-            <div class="card h-100 shadow-sm border-0 card-hover">
-                <img src="assets/halloween-img-menu.jpg" class="card-img-top rounded-top" alt="Halloween">
-                <div class="card-body">
-                    <h5 class="fw-bold">Menu Halloween</h5>
-                    <p class="text-muted small">Déclinaison de courges et saveurs mystérieuses.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-cheddar">32€ / pers.</span>
-                        <button class="btn btn-outline-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalHalloween">Détails</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 menu-item" data-theme="Classique">
-            <div class="card h-100 shadow-sm border-0 card-hover">
-                <img src="assets/classique-img-menu.jpg" class="card-img-top rounded-top" alt="Classique">
-                <div class="card-body">
-                    <h5 class="fw-bold">Menu Classique</h5>
-                    <p class="text-muted small">Les incontournables de Julie pour vos repas quotidiens.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-cheddar">25€ / pers.</span>
-                        <button class="btn btn-outline-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalClassique">Détails</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 menu-item" data-theme="Mariage">
-            <div class="card h-100 shadow-sm border-0 card-hover">
-                <img src="assets/mariage-img-menu.jpg" class="card-img-top rounded-top" alt="Mariage">
-                <div class="card-body">
-                    <h5 class="fw-bold">Menu Mariage</h5>
-                    <p class="text-muted small">Un banquet d'exception pour le plus beau jour.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-cheddar">85€ / pers.</span>
-                        <button class="btn btn-outline-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalMariage">Détails</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 menu-item" data-theme="Bapteme">
-            <div class="card h-100 shadow-sm border-0 card-hover">
-                <img src="assets/bapteme-img-menu.jpg" class="card-img-top rounded-top" alt="Baptême">
-                <div class="card-body">
-                    <h5 class="fw-bold">Menu Baptême</h5>
-                    <p class="text-muted small">Douceur et partage pour célébrer en famille.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-cheddar">55€ / pers.</span>
-                        <button class="btn btn-outline-dark btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalBapteme">Détails</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <?php endforeach; ?>
     </div>
-</main><footer class="bg-dark text-white py-5 mt-5">
+
+    <div id="no-result-message" class="text-center py-5" style="display: none;">
+        <div class="display-1">🍽️</div>
+        <h3 class="mt-3 fw-bold text-muted">Aucun menu ne correspond à vos critères</h3>
+        <p class="text-secondary">Essayez de modifier vos filtres pour voir plus de délices !</p>
+    </div>
+</div>
+    
+</div>
+    
+</main>
+    <footer class="bg-dark text-white py-5 mt-5">
         <div class="container text-center text-md-start">
             <div class="row gy-4">
                 <div class="col-md-3">
