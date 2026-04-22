@@ -37,9 +37,9 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
 
                 <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                     <ul class="navbar-nav">
-                        <li class="nav-item"><a class="nav-link" href="../index.php">Accueil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="../nos-menus.php">Menus</a></li>
-                        <li class="nav-item"><a class="nav-link" href="../contact.php">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" href="index.php">Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="nos-menus.php">Menus</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
                     </ul>
                 </div>
 
@@ -53,8 +53,24 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
                         <?php endif; ?>
                         
                     </a>
-                    <a href="connexion.php" class="btn btn-dark rounded-pill px-4">👤</a>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <div class="dropdown">
+                            <a class="btn btn-outline-dark rounded-pill dropdown-toggle border-0 fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <?= htmlspecialchars($_SESSION['user_nom']) ?> 👤
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                <li><a class="dropdown-item py-2" href="mon-profil.php">Mon profil</a></li>
+                                <li><a class="dropdown-item py-2" href="mes-commandes.php">Mes commandes</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 text-danger" href="deconnexion.php">Déconnexion</a></li>
+                            </ul>
+                        </div>
+                    <?php else: ?>
+                        <a href="connexion.php" class="btn btn-dark rounded-pill px-4">Connexion</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </nav>
     </header>
+
+    
