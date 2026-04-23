@@ -23,7 +23,6 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
     <link rel="stylesheet" href="../styles/css/nos-menus.css">
 </head>
 <body>
-
     <header class="navbar-custom sticky-top shadow-sm">
         <nav class="navbar navbar-expand-lg">
             <div class="container">
