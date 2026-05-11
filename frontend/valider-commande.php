@@ -2,30 +2,53 @@
 session_start();
 require_once '../backend/config.php';
 
-// Sécurité : Si pas connecté ou panier vide 
 if (!isset($_SESSION['user_id']) || empty($_SESSION['panier'])) {
     header("Location: connexion.php");
     exit();
 }
 
 try {
-    $pdo->beginTransaction(); // On démarre une transaction pour être sûr que tout s'enregistre ou rien du tout
+    $pdo->beginTransaction();
 
-    // 1. Calcul du total (on récupère les prix en BDD)
-    $total_commande = 0;
+    // 1. Calcul du total de base (HT)
+    $total_articles = 0;
     foreach ($_SESSION['panier'] as $id_menu => $quantite) {
         $stmt = $pdo->prepare("SELECT prix_pers FROM menu WHERE id = ?");
         $stmt->execute([$id_menu]);
         $menu = $stmt->fetch();
-        $total_commande += $menu['prix_pers'] * $quantite;
+        $total_articles += $menu['prix_pers'] * $quantite;
     }
 
-    // 2. Insertion dans la table 'commandes'
-    $stmt = $pdo->prepare("INSERT INTO commandes (id_utilisateur, total) VALUES (?, ?)");
-    $stmt->execute([$_SESSION['user_id'], $total_commande]);
-    $id_commande = $pdo->lastInsertId(); // On récupère l'ID de la commande tout juste créée
+    // --- NOUVEAU : CALCUL DE LA LOGIQUE MÉTIER ---
+    
+    // A. Calcul de la réduction (10% si + de 5 articles)
+    $quantite_totale = array_sum($_SESSION['panier']);
+    $reduction = ($quantite_totale > 5) ? ($total_articles * 0.10) : 0;
 
-    // 3. Insertion de chaque article dans 'details_commandes'
+    // B. Récupération de la ville pour les frais kilométriques
+    $stmt = $pdo->prepare("SELECT ville FROM utilisateurs WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch();
+    $ville = strtolower(trim($user['ville'] ?? ''));
+
+    if ($ville == "maisse") {
+        $frais = 2.00;
+    } elseif (in_array($ville, ["evry", "corbeil", "essonnes", "boutigny"])) {
+        $frais = 5.00;
+    } else {
+        $frais = 8.50;
+    }
+
+    // C. TOTAL FINAL RÉEL
+    $total_final = ($total_articles - $reduction) + $frais;
+
+    // 2. Insertion dans 'commandes' (On enregistre le $total_final !)
+    // J'ai ajouté le champ 'statut' pour que ce soit plus complet
+    $stmt = $pdo->prepare("INSERT INTO commandes (id_utilisateur, total, statut, date_commande) VALUES (?, ?, 'En préparation', NOW())");
+    $stmt->execute([$_SESSION['user_id'], $total_final]);
+    $id_commande = $pdo->lastInsertId();
+
+    // 3. Insertion dans 'details_commandes'
     foreach ($_SESSION['panier'] as $id_menu => $quantite) {
         $stmt = $pdo->prepare("SELECT prix_pers FROM menu WHERE id = ?");
         $stmt->execute([$id_menu]);
@@ -35,16 +58,13 @@ try {
         $stmt->execute([$id_commande, $id_menu, $quantite, $menu['prix_pers']]);
     }
 
-    $pdo->commit(); // On valide tout en BDD
+    $pdo->commit();
 
-    // 4. On vide le panier !
     unset($_SESSION['panier']);
-
-    // 5. Redirection vers une page de succès
     header("Location: confirmation.php?id=" . $id_commande);
     exit();
 
 } catch (Exception $e) {
-    $pdo->rollBack(); // En cas d'erreur, on annule tout ce qui a été fait
+    $pdo->rollBack();
     die("Erreur lors de la commande : " . $e->getMessage());
 }
