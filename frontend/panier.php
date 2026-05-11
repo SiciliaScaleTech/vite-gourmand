@@ -86,10 +86,14 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
                 </tfoot>
             </table>
         </div>
+        <div class="alert alert-info d-inline-block mt-2 border-0 shadow-sm">
+            <i class="bi bi-info-circle-fill me-2"></i> 
+            ℹ️ <strong>Paiement sécurisé :</strong> Le règlement s'effectue directement lors du retrait de votre commande.
+        </div>
 
         <div class="d-flex justify-content-between mt-4">
             <a href="nos-menus.php" class="btn btn-outline-dark rounded-pill">Continuer mes achats</a>
-            <a href="commander.php" class="btn btn-cheddar rounded-pill px-5 fw-bold">Valider la commande</a>
+            <a href="valider-commande.php" class="btn btn-cheddar rounded-pill px-5 fw-bold">Valider la commande</a>
         </div>
     <?php endif; ?>
 </main>
