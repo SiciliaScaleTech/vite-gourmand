@@ -1,12 +1,33 @@
 <?php
-include 'includes/header.php';
+session_start();
 require_once '../backend/config.php';
 
+// --- 1. LOGIQUE DE MISE À JOUR (PLUS / MOINS / SUPPRIMER) ---
+if (isset($_GET['action']) && isset($_GET['id'])) {
+    $id_modif = $_GET['id'];
+    $action = $_GET['action'];
+
+    if (isset($_SESSION['panier'][$id_modif])) {
+        if ($action === 'augmenter') {
+            $_SESSION['panier'][$id_modif]++;
+        } elseif ($action === 'diminuer') {
+            $_SESSION['panier'][$id_modif]--;
+            // Si la quantité tombe à 0, on retire le menu du panier
+            if ($_SESSION['panier'][$id_modif] <= 0) {
+                unset($_SESSION['panier'][$id_modif]);
+            }
+        }
+    }
+    // On recharge la page pour valider les calculs et "nettoyer" l'URL des paramètres GET
+    header("Location: panier.php");
+    exit();
+}
+
+// --- 2. RÉCUPÉRATION DES DONNÉES DU PANIER ---
 $panier_details = [];
 $total_general = 0;
 
 if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
-    // On récupère tous les IDs du panier pour faire une seule requête SQL
     $ids = array_keys($_SESSION['panier']);
     $comma_separated_ids = implode(',', array_fill(0, count($ids), '?'));
 
@@ -14,17 +35,15 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
     $stmt->execute($ids);
     $menus_bdd = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // On prépare un tableau propre pour l'affichage
     foreach ($menus_bdd as $menu) {
         $quantite = $_SESSION['panier'][$menu['id']];
         $sous_total = $menu['prix_pers'] * $quantite;
-
-        $galerie_nettoyee = str_replace('assets/', '', $menu['galerie']);
-    // 2. On découpe la chaîne dès qu'on voit un "|"
-        $images_tableau = explode('|', $galerie_nettoyee);
-    // 3. On ne garde que la première image (l'index 0)
-        $premiere_image = $images_tableau[0];
         $total_general += $sous_total;
+
+        // Gestion de l'image
+        $galerie_nettoyee = str_replace('assets/', '', $menu['galerie']);
+        $images_tableau = explode('|', $galerie_nettoyee);
+        $premiere_image = $images_tableau[0];
 
         $panier_details[] = [
             'id' => $menu['id'],
@@ -36,6 +55,8 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
         ];
     }
 }
+
+include 'includes/header.php'; 
 ?>
 
 <main class="container py-5">
@@ -69,7 +90,23 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
                         </td>
                         <td><?= number_format($item['prix'], 2) ?> €</td>
                         <td>
-                            <span class="badge bg-secondary p-2 px-3"><?= $item['qte'] ?></span>
+                            <div class="d-flex align-items-center gap-3">
+                                <a href="panier.php?id=<?= $item['id'] ?>&action=diminuer" 
+                                class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" 
+                                style="width: 28px; height: 28px; text-decoration: none;">
+                                -
+                                </a>
+
+                                <span class="fw-bold fs-5" style="min-width: 20px; text-align: center;">
+                                    <?= $item['qte'] ?>
+                                </span>
+
+                                <a href="panier.php?id=<?= $item['id'] ?>&action=augmenter" 
+                                class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" 
+                                style="width: 28px; height: 28px; text-decoration: none;">
+                                +
+                                </a>
+                            </div>
                         </td>
                         <td class="fw-bold"><?= number_format($item['sous_total'], 2) ?> €</td>
                         <td>
