@@ -1,43 +1,55 @@
+// Cette partie permet de lancer le filtre automatiquement 
+// quand tu reviens sur la page ou après avoir cliqué sur "Actualiser"
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("Page chargée, lancement du filtre...");
+    filterMenus();
+});
+
 function filterMenus() {
-    // Récupération des valeurs des filtres
-    const themeSelected = document.querySelector('select[name="theme"]').value;
-    const prixMaxInput = document.querySelector('input[name="prix_max"]').value;
-    const minRange = document.querySelector('input[name="min"]').value;
-    const maxRange = document.querySelector('input[name="max"]').value;
-    const persMinInput = document.querySelector('input[name="pers_min"]').value;
+    // 1. Récupération sécurisée des éléments (on vérifie s'ils existent pour éviter les erreurs)
+    const themeSelect = document.querySelector('select[name="theme"]');
+    const prixInput = document.querySelector('input[name="prix_max"]');
+    const persInput = document.querySelector('input[name="pers_min"]');
+    const allergeneSelect = document.querySelector('select[name="allergene"]');
+
+    // Si le formulaire n'est pas trouvé, on arrête tout pour ne pas créer d'erreur
+    if (!themeSelect) return;
+
+    const theme = themeSelect.value;
+    const prixMax = prixInput.value ? parseFloat(prixInput.value) : null;
+    const persMinReq = persInput.value ? parseInt(persInput.value) : null;
+    const allergenePasVoulu = allergeneSelect ? allergeneSelect.value.toLowerCase() : "";
 
     const items = document.querySelectorAll('.menu-item');
-    const noResult = document.getElementById('no-result-message');
-    let hasResults = false; // Flag pour savoir si on a trouvé quelque chose
+    let hasResults = false;
 
     items.forEach(item => {
-        let isVisible = true;
-
-        // Récupération des données du menu
+        // 2. Récupération des données data-attributes du HTML
         const itemTheme = item.getAttribute('data-theme');
         const itemPrix = parseFloat(item.getAttribute('data-prix'));
         const itemPersMin = parseInt(item.getAttribute('data-pers-min'));
+        const itemAllergenes = item.getAttribute('data-allergenes') ? item.getAttribute('data-allergenes').toLowerCase() : "";
 
-        // --- FILTRES ---
-        if (themeSelected !== "" && itemTheme !== themeSelected) isVisible = false;
-        if (prixMaxInput !== "" && itemPrix > parseFloat(prixMaxInput)) isVisible = false;
-        if (minRange !== "" && itemPrix < parseFloat(minRange)) isVisible = false;
-        if (maxRange !== "" && itemPrix > parseFloat(maxRange)) isVisible = false;
+        let isVisible = true;
+
+        // 3. Application des filtres
+        if (theme !== "" && itemTheme !== theme) isVisible = false;
+        if (prixMax !== null && itemPrix > prixMax) isVisible = false;
+        if (persMinReq !== null && itemPersMin < persMinReq) isVisible = false;
         
-        // Logique Personnes : On cache si le menu exige plus de monde que ce que l'utilisateur a
-        if (persMinInput !== "" && itemPersMin < parseInt(persMinInput)) {
-    isVisible = false;
-}
-
-        // --- AFFICHAGE ---
-        if (isVisible) {
-            item.style.display = "block";
-            hasResults = true; // On a trouvé au moins un menu !
-        } else {
-            item.style.display = "none";
+        // Logique allergène : si le menu CONTIENT l'allergène qu'on veut éviter, on cache
+        if (allergenePasVoulu !== "" && itemAllergenes.includes(allergenePasVoulu)) {
+            isVisible = false;
         }
+
+        // 4. Affichage ou masquage
+        item.style.display = isVisible ? "block" : "none";
+        if (isVisible) hasResults = true;
     });
 
-    // Gestion du message d'erreur
-    noResult.style.display = hasResults ? "none" : "block";
+    // 5. Message "Aucun résultat"
+    const noResult = document.getElementById('no-result-message');
+    if (noResult) {
+        noResult.style.display = hasResults ? "none" : "block";
+    }
 }

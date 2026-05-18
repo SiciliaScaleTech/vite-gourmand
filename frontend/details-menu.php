@@ -33,7 +33,7 @@ try {
 }
 ?>
 
-
+<?php include 'includes/header.php'; ?>
 
 <div class="container py-5">
     <a href="nos-menus.php" class="btn btn-outline-secondary mb-4">← Retour aux menus</a>
@@ -101,6 +101,5 @@ try {
         </div>
     </div>
 </div>
-
 
 <?php include 'includes/footer.php'; ?>

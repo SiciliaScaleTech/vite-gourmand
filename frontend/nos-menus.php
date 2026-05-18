@@ -1,69 +1,79 @@
 <?php
-// 1. On appelle le header (qui fait le session_start)
-include 'includes/header.php';
-
-// 2. On appelle la config BDD
+session_start();
 require_once '../backend/config.php';
 
-// 3. On récupère les menus UNIQUEMENT pour cette page
+// On sauvegarde en session UNIQUEMENT si on reçoit des données
+if (!empty($_GET)) {
+    $_SESSION['f_theme'] = $_GET['theme'] ?? '';
+    $_SESSION['f_prix']  = $_GET['prix_max'] ?? '';
+    $_SESSION['f_pers']  = $_GET['pers_min'] ?? '';
+    $_SESSION['f_aller'] = $_GET['allergene'] ?? '';
+}
+
+// On récupère pour l'affichage (vide si rien en session)
+$t_prie = $_SESSION['f_theme'] ?? '';
+$p_prie = $_SESSION['f_prix'] ?? '';
+$n_prie = $_SESSION['f_pers'] ?? '';
+$a_prie = $_SESSION['f_aller'] ?? '';
+
 try {
-    $query = $pdo->query("SELECT id, nom_technique, titre, description, galerie, prix_pers, pers_min FROM menu ORDER BY id ASC");
+    // Vérifie bien que 'allergene' existe dans ta table 'menu' en BDD
+    $query = $pdo->query("SELECT * FROM menu ORDER BY id ASC");
     $menus = $query->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Erreur : " . $e->getMessage());
+    die("Erreur BDD : " . $e->getMessage());
 }
 ?>
+
+<?php include 'includes/header.php'; ?>
 
         <section class="hero-banner text-center">
             <div class="container">
                 <h1 class="display-3 fw-bold">Vite & Gourmand</h1>
                 <p class="fs-4">Nos Menus Thématiques</p>
-                <a href="#menus" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
+                <a href="nos-menus.php" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
             </div>
         </section>
 
        <main class="container py-5">
 
     <section class="card shadow-sm border-0 bg-mimolette-light p-4 mb-5">
-        <form id="filterForm" class="row g-3 align-items-end">
+        <form id="filterForm" method="GET" action="nos-menus.php" class="row g-3 align-items-end">
             <div class="col-md-3">
                 <label class="form-label fw-bold">Thème</label>
                 <select name="theme" class="form-select border-0 shadow-sm">
                     <option value="">Tous les thèmes</option>
-                    <option value="Noel">Noël</option>
-                    <option value="Paques">Pâques</option>
-                    <option value="Halloween">Halloween</option>
-                    <option value="Classique">Classique</option>
-                    <option value="Mariage">Mariage</option>
-                    <option value="Bapteme">Baptême</option>
+                    <option value="Noel" <?= ($t_prie == 'Noel') ? 'selected' : '' ?>>Noël</option>
+                    <option value="Paques" <?= ($t_prie == 'Paques') ? 'selected' : '' ?>>Pâques</option>
+                    <option value="Halloween" <?= ($t_prie == 'Halloween') ? 'selected' : '' ?>>Halloween</option>
+                    <option value="Classique" <?= ($t_prie == 'Classique') ? 'selected' : '' ?>>Classique</option>
+                    <option value="Mariage" <?= ($t_prie == 'Mariage') ? 'selected' : '' ?>>Mariage</option>
+                    <option value="Bapteme" <?= ($t_prie == 'Bapteme') ? 'selected' : '' ?>>Baptême</option>
                 </select>
             </div>
-            <div class="col-md-2">
-                <label class="form-label fw-bold">Régime</label>
-                <select name="regime" class="form-select border-0 shadow-sm">
-                    <option value="">Tous</option>
-                    <option value="vegetarien">Végétarien</option>
-                    <option value="vegan">Vegan</option>
-                    <option value="classique">Classique</option>
-                </select>
-            </div>
+
             <div class="col-md-2">
                 <label class="form-label fw-bold">Prix Max</label>
-                <input type="number" name="prix_max" class="form-control border-0 shadow-sm" placeholder="Max €">
+                <input type="number" name="prix_max" class="form-control border-0 shadow-sm" value="<?= $p_prie ?>">
             </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Fourchette (€)</label>
-                <div class="d-flex gap-2">
-                    <input type="number" name="min" class="form-control border-0 shadow-sm" placeholder="Min">
-                    <input type="number" name="max" class="form-control border-0 shadow-sm" placeholder="Max">
-                </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Sans allergène</label>
+                <select name="allergene" class="form-select border-0 shadow-sm">
+                    <option value="">Aucun</option>
+                    <option value="gluten" <?= ($a_prie == 'gluten') ? 'selected' : '' ?>>Gluten</option>
+                    <option value="lactose" <?= ($a_prie == 'lactose') ? 'selected' : '' ?>>Lactose</option>
+                    <option value="oeufs" <?= ($a_prie == 'oeufs') ? 'selected' : '' ?>>Œufs</option>
+                </select>
             </div>
+
             <div class="col-md-2">
                 <label class="form-label fw-bold">Pers. Min</label>
-                <input type="number" name="pers_min" class="form-control border-0 shadow-sm" placeholder="Nb pers.">
+                <input type="number" name="pers_min" class="form-control border-0 shadow-sm" value="<?= $n_prie ?>">
             </div>
+
             <div class="col-12 text-center mt-4">
-                <button type="button" onclick="filterMenus()" class="btn btn-cheddar rounded-pill px-5 fw-bold shadow">
+                <button type="submit" class="btn btn-cheddar rounded-pill px-5 fw-bold shadow">
                     Actualiser les menus
                 </button>
             </div>
@@ -82,7 +92,8 @@ try {
         <div class="col-md-4 menu-item" 
              data-theme="<?= $menu['nom_technique'] ?>" 
              data-prix="<?= $menu['prix_pers'] ?>"
-             data-pers-min="<?= $menu['pers_min'] ?>">
+             data-pers-min="<?= $menu['pers_min'] ?>"
+             data-allergenes="<?= htmlspecialchars(strtolower($menu['allergene'])) ?>">
 
             <div class="card h-100 shadow-sm border-0">
                 <img src="<?= $imageVignette ?>" class="card-img-top" alt="<?= $menu['titre'] ?>" style="height: 220px; object-fit: cover;">
@@ -111,9 +122,7 @@ try {
 </div>
     
 </main>
-    <script src="styles/script/nos-menus.js"></script>
     <?php include 'includes/footer.php'; ?>
-
 
 <?php 
 $menus_details = [
