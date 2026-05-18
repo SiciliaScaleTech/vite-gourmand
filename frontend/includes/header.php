@@ -37,9 +37,15 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
 
                 <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                     <ul class="navbar-nav">
+<<<<<<< HEAD
                         <li class="nav-item"><a class="nav-link" href="index.php">Accueil</a></li>
                         <li class="nav-item"><a class="nav-link" href="nos-menus.php">Menus</a></li>
                         <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
+=======
+                        <li class="nav-item"><a class="nav-link" href="../index.php">Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="../nos-menus.php">Menus</a></li>
+                        <li class="nav-item"><a class="nav-link" href="../contact.php">Contact</a></li>
+>>>>>>> feature-accueil
                     </ul>
                 </div>
 
