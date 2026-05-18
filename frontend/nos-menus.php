@@ -1,108 +1,79 @@
 <?php
+session_start();
 require_once '../backend/config.php';
 
+// On sauvegarde en session UNIQUEMENT si on reçoit des données
+if (!empty($_GET)) {
+    $_SESSION['f_theme'] = $_GET['theme'] ?? '';
+    $_SESSION['f_prix']  = $_GET['prix_max'] ?? '';
+    $_SESSION['f_pers']  = $_GET['pers_min'] ?? '';
+    $_SESSION['f_aller'] = $_GET['allergene'] ?? '';
+}
+
+// On récupère pour l'affichage (vide si rien en session)
+$t_prie = $_SESSION['f_theme'] ?? '';
+$p_prie = $_SESSION['f_prix'] ?? '';
+$n_prie = $_SESSION['f_pers'] ?? '';
+$a_prie = $_SESSION['f_aller'] ?? '';
+
 try {
-    // On ajoute 'pers_min' pour que le filtre JS puisse l'utiliser
-    $query = $pdo->query("SELECT id, nom_technique, titre, description, galerie, prix_pers, pers_min FROM menu ORDER BY id ASC");
+    // Vérifie bien que 'allergene' existe dans ta table 'menu' en BDD
+    $query = $pdo->query("SELECT * FROM menu ORDER BY id ASC");
     $menus = $query->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Erreur : " . $e->getMessage());
+    die("Erreur BDD : " . $e->getMessage());
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite & Gourmand | Nos menus</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles/css/style.css">
-    <link rel="stylesheet" href="styles/css/nos-menus.css">
-</head>
-<body>
-
-    <header class="navbar-custom sticky-top shadow-sm">
-        <nav class="navbar navbar-expand-lg">
-            <div class="container">
-                <a class="navbar-brand" href="index.php">
-                    <img src="assets/Logo-Vite&Gourmand.png" alt="Logo" width="70">
-                </a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item"><a class="nav-link" href="index.php">Accueil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="nos-menus.php">Menus</a></li>
-                        <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
-                    </ul>
-                </div>
-
-                <div class="d-flex align-items-center">
-                    <a href="panier.php" class="cart-icon me-3 position-relative">
-                        🛒<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger small">0</span>
-                    </a>
-                    <a href="connexion.php" class="btn btn-dark rounded-pill px-4">👤</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+<?php include 'includes/header.php'; ?>
 
         <section class="hero-banner text-center">
             <div class="container">
                 <h1 class="display-3 fw-bold">Vite & Gourmand</h1>
                 <p class="fs-4">Nos Menus Thématiques</p>
-                <a href="#menus" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
+                <a href="nos-menus.php" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
             </div>
         </section>
 
        <main class="container py-5">
 
     <section class="card shadow-sm border-0 bg-mimolette-light p-4 mb-5">
-        <form id="filterForm" class="row g-3 align-items-end">
+        <form id="filterForm" method="GET" action="nos-menus.php" class="row g-3 align-items-end">
             <div class="col-md-3">
                 <label class="form-label fw-bold">Thème</label>
                 <select name="theme" class="form-select border-0 shadow-sm">
                     <option value="">Tous les thèmes</option>
-                    <option value="Noel">Noël</option>
-                    <option value="Paques">Pâques</option>
-                    <option value="Halloween">Halloween</option>
-                    <option value="Classique">Classique</option>
-                    <option value="Mariage">Mariage</option>
-                    <option value="Bapteme">Baptême</option>
+                    <option value="Noel" <?= ($t_prie == 'Noel') ? 'selected' : '' ?>>Noël</option>
+                    <option value="Paques" <?= ($t_prie == 'Paques') ? 'selected' : '' ?>>Pâques</option>
+                    <option value="Halloween" <?= ($t_prie == 'Halloween') ? 'selected' : '' ?>>Halloween</option>
+                    <option value="Classique" <?= ($t_prie == 'Classique') ? 'selected' : '' ?>>Classique</option>
+                    <option value="Mariage" <?= ($t_prie == 'Mariage') ? 'selected' : '' ?>>Mariage</option>
+                    <option value="Bapteme" <?= ($t_prie == 'Bapteme') ? 'selected' : '' ?>>Baptême</option>
                 </select>
             </div>
-            <div class="col-md-2">
-                <label class="form-label fw-bold">Régime</label>
-                <select name="regime" class="form-select border-0 shadow-sm">
-                    <option value="">Tous</option>
-                    <option value="vegetarien">Végétarien</option>
-                    <option value="vegan">Vegan</option>
-                    <option value="classique">Classique</option>
-                </select>
-            </div>
+
             <div class="col-md-2">
                 <label class="form-label fw-bold">Prix Max</label>
-                <input type="number" name="prix_max" class="form-control border-0 shadow-sm" placeholder="Max €">
+                <input type="number" name="prix_max" class="form-control border-0 shadow-sm" value="<?= $p_prie ?>">
             </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Fourchette (€)</label>
-                <div class="d-flex gap-2">
-                    <input type="number" name="min" class="form-control border-0 shadow-sm" placeholder="Min">
-                    <input type="number" name="max" class="form-control border-0 shadow-sm" placeholder="Max">
-                </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Sans allergène</label>
+                <select name="allergene" class="form-select border-0 shadow-sm">
+                    <option value="">Aucun</option>
+                    <option value="gluten" <?= ($a_prie == 'gluten') ? 'selected' : '' ?>>Gluten</option>
+                    <option value="lactose" <?= ($a_prie == 'lactose') ? 'selected' : '' ?>>Lactose</option>
+                    <option value="oeufs" <?= ($a_prie == 'oeufs') ? 'selected' : '' ?>>Œufs</option>
+                </select>
             </div>
+
             <div class="col-md-2">
                 <label class="form-label fw-bold">Pers. Min</label>
-                <input type="number" name="pers_min" class="form-control border-0 shadow-sm" placeholder="Nb pers.">
+                <input type="number" name="pers_min" class="form-control border-0 shadow-sm" value="<?= $n_prie ?>">
             </div>
+
             <div class="col-12 text-center mt-4">
-                <button type="button" onclick="filterMenus()" class="btn btn-cheddar rounded-pill px-5 fw-bold shadow">
+                <button type="submit" class="btn btn-cheddar rounded-pill px-5 fw-bold shadow">
                     Actualiser les menus
                 </button>
             </div>
@@ -121,7 +92,8 @@ try {
         <div class="col-md-4 menu-item" 
              data-theme="<?= $menu['nom_technique'] ?>" 
              data-prix="<?= $menu['prix_pers'] ?>"
-             data-pers-min="<?= $menu['pers_min'] ?>">
+             data-pers-min="<?= $menu['pers_min'] ?>"
+             data-allergenes="<?= htmlspecialchars(strtolower($menu['allergene'])) ?>">
 
             <div class="card h-100 shadow-sm border-0">
                 <img src="<?= $imageVignette ?>" class="card-img-top" alt="<?= $menu['titre'] ?>" style="height: 220px; object-fit: cover;">
@@ -150,57 +122,7 @@ try {
 </div>
     
 </main>
-    <footer class="bg-dark text-white py-5 mt-5">
-        <div class="container text-center text-md-start">
-            <div class="row gy-4">
-                <div class="col-md-3">
-                    <h5 class="fw-bold text-cheddar">Vite & Gourmand</h5>
-                    <p class="small text-secondary">L'art de bien manger, cuisiné par Julie et livré par José.</p>
-                </div>
-
-                <div class="col-md-3">
-        <h6 class="fw-bold text-white mb-3">Nos Horaires</h6>
-        <ul class="list-unstyled small text-secondary mx-auto mx-md-0" style="max-width: 200px;">
-            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-                <span>Lundi</span> 
-                <span class="text-danger fw-bold">Fermé</span>
-            </li>
-            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-                <span>Mar - Ven</span> 
-                <span>11h - 21h</span>
-            </li>
-            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-                <span>Samedi</span> 
-                <span>10h - 22h</span>
-            </li>
-            <li class="d-flex justify-content-between border-bottom border-secondary mb-1">
-                <span>Dimanche</span> 
-                <span>10h - 15h</span>
-            </li>
-        </ul>
-    </div>
-
-            <div class="col-md-3">
-                <h6 class="fw-bold text-white mb-3">Informations</h6>
-                <ul class="list-unstyled d-flex flex-column gap-2">
-                    <li><a href="#" class="text-white-50 text-decoration-none small">Mentions Légales</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none small">Politique de cookies</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none small">CGU</a></li>
-                </ul>
-            </div>
-
-            <div class="col-md-3 text-secondary small">
-                <h6 class="fw-bold text-white mb-3">Contact</h6>
-                <p class="mb-1">julie@vite-gourmand.fr</p>
-                <p> José : 06.69.25.58.47</p>
-            </div>
-        </div>
-        <hr class="my-4 border-secondary">
-            <div class="text-center">
-                <p class="mb-0 small text-secondary">&copy; 2026 Vite & Gourmand - Tous droits réservés.</p>
-            </div>
-        </div>
-    </footer>
+    <?php include 'includes/footer.php'; ?>
 
 <?php 
 $menus_details = [
