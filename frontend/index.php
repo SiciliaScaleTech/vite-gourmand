@@ -1,20 +1,11 @@
-<<<<<<< HEAD
-
 <?php include 'includes/header.php'; ?>
 
-=======
-<?php include 'includes/header.php'; ?>
->>>>>>> feature-connexion
     <main>
         <section class="hero-banner text-center">
             <div class="container">
                 <h1 class="display-3 fw-bold">Vite & Gourmand</h1>
                 <p class="fs-4">L'excellence culinaire à votre porte.</p>
-<<<<<<< HEAD
                 <a href="nos-menus.php" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
-=======
-                <a href="#menus" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
->>>>>>> feature-connexion
             </div>
         </section>
 
@@ -86,8 +77,5 @@
         </section>
     </main>
 
-<<<<<<< HEAD
-=======
     
->>>>>>> feature-connexion
     <?php include 'includes/footer.php'; ?>

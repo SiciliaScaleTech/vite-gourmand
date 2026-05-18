@@ -23,10 +23,6 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
     <link rel="stylesheet" href="../styles/css/nos-menus.css">
 </head>
 <body>
-<<<<<<< HEAD
-
-=======
->>>>>>> feature-connexion
     <header class="navbar-custom sticky-top shadow-sm">
         <nav class="navbar navbar-expand-lg">
             <div class="container">
@@ -56,13 +52,6 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
                         <?php endif; ?>
                         
                     </a>
-<<<<<<< HEAD
-                    <a href="connexion.php" class="btn btn-dark rounded-pill px-4">👤</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-=======
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <div class="dropdown">
                             <a class="btn btn-outline-dark rounded-pill dropdown-toggle border-0 fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -84,4 +73,3 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
     </header>
 
     
->>>>>>> feature-connexion

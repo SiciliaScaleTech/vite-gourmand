@@ -6,19 +6,14 @@
 }
 
 body {
-<<<<<<< HEAD
-=======
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
->>>>>>> feature-connexion
     font-family: 'Poppins', sans-serif;
     background-color: #f8f9fa;
 }
 
-<<<<<<< HEAD
-=======
 main {
     flex: 1 0 auto;
 }
@@ -27,7 +22,6 @@ footer {
     flex-shrink: 0;
 }
 
->>>>>>> feature-connexion
 /* Header & Nav */
 .navbar-custom {
     background-color: var(--mimolette);
@@ -105,8 +99,6 @@ footer {
 .testimonial-card {
     min-width: 320px;
     margin: 10px;
-<<<<<<< HEAD
-=======
 }
 
 .alert-cheddar {
@@ -124,5 +116,4 @@ footer {
 
 .alert-cheddar a:hover {
     color: #fb8500;
->>>>>>> feature-connexion
 }
