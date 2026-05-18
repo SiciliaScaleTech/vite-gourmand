@@ -23,7 +23,10 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
     <link rel="stylesheet" href="../styles/css/nos-menus.css">
 </head>
 <body>
+<<<<<<< HEAD
 
+=======
+>>>>>>> feature-connexion
     <header class="navbar-custom sticky-top shadow-sm">
         <nav class="navbar navbar-expand-lg">
             <div class="container">
@@ -53,8 +56,32 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
                         <?php endif; ?>
                         
                     </a>
+<<<<<<< HEAD
                     <a href="connexion.php" class="btn btn-dark rounded-pill px-4">👤</a>
                 </div>
             </div>
         </nav>
     </header>
+=======
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <div class="dropdown">
+                            <a class="btn btn-outline-dark rounded-pill dropdown-toggle border-0 fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <?= htmlspecialchars($_SESSION['user_nom']) ?> 👤
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                <li><a class="dropdown-item py-2" href="mon-profil.php">Mon profil</a></li>
+                                <li><a class="dropdown-item py-2" href="mes-commandes.php">Mes commandes</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 text-danger" href="deconnexion.php">Déconnexion</a></li>
+                            </ul>
+                        </div>
+                    <?php else: ?>
+                        <a href="connexion.php" class="btn btn-dark rounded-pill px-4">Connexion</a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    
+>>>>>>> feature-connexion
