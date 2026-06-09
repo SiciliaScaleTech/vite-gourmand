@@ -1,103 +1,127 @@
 <?php
-require_once '../backend/config.php';
+session_start();
+require_once '../backend/config.php'; // Ajuste le chemin si ton fichier est à la racine (retire les ../)
 
-// 1. On récupère l'ID envoyé dans l'URL (ex: details-menu.php?id=1)
-// On utilise filter_input pour sécuriser la donnée reçue
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-if (!$id) {
-    // Si pas d'ID valide, on redirige vers la liste
+// 1. Récupération de l'ID du menu dans l'URL
+if (!isset($_GET['id']) || empty($_GET['id'])) {
     header('Location: nos-menus.php');
-    exit;
+    exit();
 }
 
+$menu_id = (int)$_GET['id'];
+
+// 2. Requête pour choper LE menu sélectionné en temps réel
 try {
-    // 2. On va chercher TOUTES les infos de ce menu précis
-    $stmt = $pdo->prepare("SELECT * FROM menu WHERE id = :id");
-    $stmt->execute(['id' => $id]);
+    $stmt = $pdo->prepare("SELECT * FROM menu WHERE id = ?");
+    $stmt->execute([$menu_id]);
     $menu = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Si le menu n'existe pas en BDD
     if (!$menu) {
-        die("Désolé, ce menu n'existe pas.");
+        die("Le menu demandé n'existe pas.");
     }
-
-    // 3. On prépare les listes (on transforme les chaînes de texte en tableaux PHP)
-    $galerie = explode('|', $menu['galerie']);
-    $plats = explode('|', $menu['plats']);
-
 } catch (PDOException $e) {
-    die("Erreur de connexion : " . $e->getMessage());
+    die("Erreur BDD : " . $e->getMessage());
 }
+
+include 'includes/header.php';
 ?>
 
-<?php include 'includes/header.php'; ?>
-
-<div class="container py-5">
-    <a href="nos-menus.php" class="btn btn-outline-secondary mb-4">← Retour aux menus</a>
-
-    <div class="row g-5">
-        <div class="col-lg-6">
-            <div id="carouselMenu" class="carousel slide shadow rounded overflow-hidden" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <?php foreach ($galerie as $index => $image): ?>
-                        <div class="carousel-item <?= ($index === 0) ? 'active' : '' ?>">
-                            <img src="<?= $image ?>" class="d-block w-100" alt="Photo du menu" style="height: 450px; object-fit: cover;">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselMenu" data-bs-content="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselMenu" data-bs-next="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <h1 class="display-5 fw-bold mb-3"><?= $menu['titre'] ?></h1>
-            <p class="lead text-muted mb-4"><?= $menu['description'] ?></p>
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
             
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h4 class="card-title mb-3">Composition du menu</h4>
-                    <ul class="list-group list-group-flush">
-                        <?php foreach ($plats as $plat): ?>
-                            <li class="list-group-item px-0"> <?= $plat ?></li>
-                        <?php endforeach; ?>
-                    </ul>
+            <a href="nos-menus.php" class="btn btn-outline-primary rounded-pill mb-4">⬅️ Retour aux menus</a>
+
+            <div class="card shadow border-0 rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    
+                    <!-- Colonne Image (Galerie) -->
+                    <div class="col-md-6">
+                        <?php 
+                            $galerie = !empty($menu['galerie']) ? explode('|', $menu['galerie']) : [];
+                            $image_principale = !empty($galerie[0]) ? $galerie[0] : 'assets/images/pizza-placeholder.jpg';
+                        ?>
+                        <img src="<?= htmlspecialchars($image_principale) ?>" class="img-fluid w-100 h-100" style="object-fit: cover; min-height: 350px;" alt="<?= htmlspecialchars($menu['titre']) ?>">
+                    </div>
+
+                    <!-- Colonne Infos -->
+                    <div class="col-md-6 p-5 d-flex flex-column justify-content-between">
+                        <div>
+                            <span class="badge bg-primary text-uppercase mb-2"><?= htmlspecialchars($menu['categorie']) ?></span>
+                            <h1 class="fw-bold mb-3"><?= htmlspecialchars($menu['titre']) ?></h1>
+                            
+                            <h6 class="fw-bold text-secondary">Description :</h6>
+                            <p class="text-muted small mb-4"><?= htmlspecialchars($menu['description']) ?></p>
+
+                            <h6 class="fw-bold text-secondary">Composition / Plats :</h6>
+                            <div class="bg-light p-3 rounded-3 mb-4">
+                                <ul class="list-unstyled mb-0 small text-dark">
+                                    <?php 
+                                    if (!empty($menu['plats'])) {
+                                        // On découpe par rapport aux barres verticales '|'
+                                        $liste_plats = explode('|', $menu['plats']);
+
+                                        foreach ($liste_plats as $un_plat) {
+                                            $un_plat = trim($un_plat);
+                                            
+                                            if (!empty($un_plat)) {
+                                                // On cherche s'il y a un ":" pour isoler "Entrée", "Plat" ou "Dessert"
+                                                if (strpos($un_plat, ':') !== false) {
+                                                    // On sépare en deux morceaux : avant le ":" et après le ":"
+                                                    list($titre, $details) = explode(':', $un_plat, 2);
+                                                    
+                                                    // On affiche le titre en gras et le détail en normal
+                                                    echo "<li class='mb-2'><strong class='text-capitalize'>" . htmlspecialchars(trim($titre)) . " :</strong>" . htmlspecialchars($details) . "</li>";
+                                                } else {
+                                                    // Si jamais un plat n'a pas de ":", on l'affiche normalement
+                                                    echo "<li class='mb-2'>" . htmlspecialchars($un_plat) . "</li>";
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        echo "<li class='text-muted italic'>Aucune composition spécifiée pour le moment.</li>";
+                                    }
+                                    ?>
+                                </ul>
+                            </div>
+
+                            <!-- AFFICHAGE DU STOCK EN TEMPS RÉEL CÔTÉ CLIENT -->
+                            <div class="p-3 rounded-3 border mb-4 bg-white shadow-sm">
+                                <p class="small mb-1"><strong>Personnes minimum :</strong> <?= htmlspecialchars($menu['pers_min']) ?> pers.</p>
+                                <p class="small mb-1"><strong>Allergènes :</strong> <span class="text-danger fw-bold"><?= htmlspecialchars($menu['allergene'] ?? 'Néant') ?></span></p>
+                                <p class="small mb-0">
+                                    <strong>Disponibilité actuelle :</strong> 
+                                    <?php if ($menu['stock'] <= 0): ?>
+                                        <span class="text-danger fw-bold">Victime de son succès (Épuisé)</span>
+                                    <?php else: ?>
+                                        <span class="text-success fw-bold">En stock (<?= htmlspecialchars($menu['stock']) ?> dispo)</span>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Zone de Prix et Réservation -->
+                        <div class="d-flex justify-content-between align-items-center border-top pt-4">
+                            <div>
+                                <span class="text-muted small">Prix par personne :</span>
+                                <h3 class="fw-bold text-primary mb-0"><?= number_format($menu['prix_pers'], 2, ',', ' ') ?> €</h3>
+                            </div>
+                            
+                            <!-- Désactiver le bouton si le stock est à zéro -->
+                            <?php if ($menu['stock'] <= 0): ?>
+                                <button class="btn btn-secondary btn-lg rounded-pill px-4 fw-bold shadow-sm" disabled>Indisponible</button>
+                            <?php else: ?>
+                                <button class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm">Réserver ce menu</button>
+                            <?php endif; ?>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
-            <div class="row mb-4">
-                <div class="col-6">
-                    <p class="mb-1 text-muted">Prix par personne</p>
-                    <h3 class="text-primary"><?= $menu['prix_pers'] ?> €</h3>
-                </div>
-                <div class="col-6">
-                    <p class="mb-1 text-muted">Minimum requis</p>
-                    <h3><?= $menu['pers_min'] ?> pers.</h3>
-                </div>
-            </div>
-
-            <div class="alert alert-warning border-0 shadow-sm">
-                <strong>Allergènes :</strong> <?= $menu['allergene'] ?>
-            </div>
-
-            <div class="p-3 bg-white rounded shadow-sm mb-4">
-                <p class="mb-1 text-muted small">Conditions particulières :</p>
-                <p class="mb-0 italic"><?= $menu['conditions'] ?></p>
-            </div>
-
-            <div class="d-grid gap-2">
-                <a href="ajouter-panier.php?id=<?= $menu['id'] ?>" class="btn btn-cheddar btn-lg px-5 rounded-pill fw-bold">
-                    Commander ce menu
-                </a>
-                <p class="text-center text-danger mt-2 small">Attention : seulement <?= $menu['stock'] ?> menus disponibles !</p>
-            </div>
         </div>
     </div>
-</div>
+</main>
 
 <?php include 'includes/footer.php'; ?>

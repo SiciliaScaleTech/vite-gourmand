@@ -110,12 +110,12 @@ include 'includes/header.php';
                             
                             <!-- BOUTON : Accès direct au Dashboard pour Julie / Admin -->
                             <?php if (in_array($user['role'] ?? '', ['employe', 'admin'])): ?>
-                                <a href="employe-dashboard.php" class="btn btn-dark rounded-pill fw-bold mt-2 shadow-sm">
+                                <a href="employe/employe-dashboard.php" class="btn btn-dark rounded-pill fw-bold mt-2 shadow-sm">
                                     Accéder au Tableau de Bord Professionnel
                                 </a>
                             <?php endif; ?>
 
-                            <!-- 🔒 CONDITION INVERSÉE : On affiche "Nous contacter" UNIQUEMENT pour les clients normaux -->
+                            <!-- CONDITION INVERSÉE : On affiche "Nous contacter" UNIQUEMENT pour les clients normaux -->
                             <?php if (!in_array($user['role'] ?? '', ['employe', 'admin'])): ?>
                                 <hr class="my-3">
                                 <a href="contact.php" class="btn btn-outline-dark rounded-pill">

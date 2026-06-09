@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once '../backend/config.php';
+require_once '../../backend/config.php';
 
 // 🛡️ SÉCURITÉ : Accès réservé aux employés et admins
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit();
 }
 
@@ -61,7 +61,7 @@ if (!$commande) {
     die("Commande introuvable.");
 }
 
-include 'includes/header.php';
+include '../includes/header.php';
 ?>
 
 <main class="container py-5">
@@ -172,4 +172,4 @@ function toggleAnnulationBlock() {
 document.addEventListener("DOMContentLoaded", toggleAnnulationBlock);
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

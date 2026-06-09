@@ -20,7 +20,8 @@ function filterMenus() {
     const persMinReq = persInput.value ? parseInt(persInput.value) : null;
     const allergenePasVoulu = allergeneSelect ? allergeneSelect.value.toLowerCase() : "";
 
-    const items = document.querySelectorAll('.menu-item');
+    const items = document.querySelectorAll('#menu-container .menu-item');
+    
     let hasResults = false;
 
     items.forEach(item => {

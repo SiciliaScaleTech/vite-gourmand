@@ -1,11 +1,11 @@
 <?php
 session_start();
-require_once '../backend/config.php';
+require_once '../../backend/config.php';
 
 // 🛡️ SÉCURITÉ : Vérification du rôle Employé ou Admin
 // Si l'utilisateur n'est pas connecté OU n'a pas le bon rôle, on le jette à l'accueil
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit();
 }
 
@@ -37,7 +37,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params); // La ligne 36 va adorer cette correction !
 $commandes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-include 'includes/header.php';
+include '../includes/header.php';
 ?>
 
 <main class="container-fluid py-5 px-4">
@@ -49,7 +49,10 @@ include 'includes/header.php';
                 <h2>Espace Employé — Tableau de Bord</h2>
                 <p class="text-muted mb-0">Connecté(e) en tant que : <strong><?= htmlspecialchars($_SESSION['user_prenom'] ?? 'Julie') ?></strong></p>
             </div>
-            <a href="employe-avis.php" class="btn btn-warning rounded-pill fw-bold shadow-sm">💬 Modérer les avis clients</a>
+            <div class="d-flex gap-2">
+                <a href="employe-carte.php" class="btn btn-success rounded-pill fw-bold shadow-sm">Gérer la Carte & Stocks</a>
+                <a href="employe-avis.php" class="btn btn-warning rounded-pill fw-bold shadow-sm">Modérer les avis</a>
+            </div>
         </div>
 
         <div class="col-12 mb-4">
@@ -148,4 +151,4 @@ include 'includes/header.php';
     </div>
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

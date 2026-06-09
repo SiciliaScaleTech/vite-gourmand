@@ -27,15 +27,15 @@ try {
 
 <?php include 'includes/header.php'; ?>
 
-        <section class="hero-banner text-center">
-            <div class="container">
-                <h1 class="display-3 fw-bold">Vite & Gourmand</h1>
-                <p class="fs-4">Nos Menus Thématiques</p>
-                <a href="nos-menus.php" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
-            </div>
-        </section>
+<section class="hero-banner text-center">
+    <div class="container">
+        <h1 class="display-3 fw-bold">Vite & Gourmand</h1>
+        <p class="fs-4">Nos Menus Thématiques</p>
+        <a href="nos-menus.php" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
+    </div>
+</section>
 
-       <main class="container py-5">
+<main class="container py-5">
 
     <section class="card shadow-sm border-0 bg-mimolette-light p-4 mb-5">
         <form id="filterForm" method="GET" action="nos-menus.php" class="row g-3 align-items-end">
@@ -81,48 +81,47 @@ try {
     </section>
 
     <div class="container my-5">
-    <h1 class="text-center mb-5">Nos Menus</h1>
+        <h1 class="text-center mb-5">Nos Menus</h1>
 
-    <div class="row g-4" id="menu-container">
-        <?php foreach ($menus as $menu): 
-            $galerie = explode('|', $menu['galerie']);
-            $imageVignette = $galerie[0];
-        ?>
-        
-        <div class="col-md-4 menu-item" 
-             data-theme="<?= $menu['nom_technique'] ?>" 
-             data-prix="<?= $menu['prix_pers'] ?>"
-             data-pers-min="<?= $menu['pers_min'] ?>"
-             data-allergenes="<?= htmlspecialchars(strtolower($menu['allergene'])) ?>">
+        <div class="row g-4" id="menu-container">
+            <?php foreach ($menus as $menu): 
+                $galerie = explode('|', $menu['galerie']);
+                $imageVignette = $galerie[0];
+            ?>
+            
+            <div class="col-md-4 menu-item" 
+                 data-theme="<?= $menu['nom_technique'] ?>" 
+                 data-prix="<?= $menu['prix_pers'] ?>"
+                 data-pers-min="<?= $menu['pers_min'] ?>"
+                 data-allergenes="<?= htmlspecialchars(strtolower($menu['allergene'])) ?>">
 
-            <div class="card h-100 shadow-sm border-0">
-                <img src="<?= $imageVignette ?>" class="card-img-top" alt="<?= $menu['titre'] ?>" style="height: 220px; object-fit: cover;">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title fw-bold"><?= $menu['titre'] ?></h5>
-                    <p class="card-text text-muted flex-grow-1">
-                        <?= mb_strimwidth($menu['description'], 0, 100, "...") ?>
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="h5 mb-0 text-primary"><?= $menu['prix_pers'] ?>€ <small class="text-muted fs-6">/ pers</small></span>
-                        <a href="details-menu.php?id=<?= $menu['id'] ?>" class="btn btn-outline-primary">Voir le détail</a>
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="<?= $imageVignette ?>" class="card-img-top" alt="<?= $menu['titre'] ?>" style="height: 220px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold"><?= $menu['titre'] ?></h5>
+                        <p class="card-text text-muted flex-grow-1">
+                            <?= mb_strimwidth($menu['description'], 0, 100, "...") ?>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="h5 mb-0 text-primary"><?= $menu['prix_pers'] ?>€ <small class="text-muted fs-6">/ pers</small></span>
+                            <a href="details-menu.php?id=<?= $menu['id'] ?>" class="btn btn-outline-primary">Voir le détail</a>
+                        </div>
                     </div>
                 </div>
             </div>
+            <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
-    </div>
 
-    <div id="no-result-message" class="text-center py-5" style="display: none;">
-        <div class="display-1">🍽️</div>
-        <h3 class="mt-3 fw-bold text-muted">Aucun menu ne correspond à vos critères</h3>
-        <p class="text-secondary">Essayez de modifier vos filtres pour voir plus de délices !</p>
+        <div id="no-result-message" class="text-center py-5" style="display: none;">
+            <div class="display-1">🍽️</div>
+            <h3 class="mt-3 fw-bold text-muted">Aucun menu ne correspond à vos critères</h3>
+            <p class="text-secondary">Essayez de modifier vos filtres pour voir plus de délices !</p>
+        </div>
     </div>
-</div>
-    
-</div>
     
 </main>
-    <?php include 'includes/footer.php'; ?>
+
+<?php include 'includes/footer.php'; ?>
 
 <?php 
 $menus_details = [
@@ -192,70 +191,69 @@ $menus_details = [
         'allergene' => 'oeufs, saumon',
         'stock' => 10
     ],
-]
+];
 ?>
 
-
-<?php
-foreach ($menus_details as $id => $info) : ?>
-<div class="modal fade" id="modal<?php echo $id; ?>" tabindex="-1" aria-hidden="true">
+<?php foreach ($menus_details as $id => $info) : ?>
+<div class="modal fade" id="modal<?= $id; ?>" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-mimolette border-0">
-                <h5 class="modal-title fw-bold"><?php echo $info['titre']; ?></h5>
+                <h5 class="modal-title fw-bold"><?= $info['titre']; ?></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body p-4">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="main-img-container mb-3">
-                <img src="<?php echo $info['galerie'][0]; ?>" id="mainImg<?php echo $id; ?>" class="img-fluid rounded-4 shadow-sm w-100" style="height: 250px; object-fit: cover;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="main-img-container mb-3">
+                            <img src="<?= $info['galerie'][0]; ?>" id="mainImg<?= $id; ?>" class="img-fluid rounded-4 shadow-sm w-100" style="height: 250px; object-fit: cover;">
+                        </div>
+                        <div class="d-flex gap-2">
+                            <?php foreach($info['galerie'] as $img) : ?>
+                                <img src="<?= $img; ?>" class="img-thumbnail rounded-3 thumb-gallery" style="width: 60px; height: 45px; object-fit: cover; cursor: pointer;" onclick="changeImg('<?= $id; ?>', '<?= $img; ?>')">
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">Description :</h6>
+                        <p class="small text-muted"><?= $info['description']; ?></p>
+                        
+                        <h6 class="fw-bold mt-3">Composition :</h6>
+                        <ul class="small mb-3">
+                            <?php foreach($info['plats'] as $plat): ?>
+                                <li><?= $plat; ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+
+                        <div class="bg-light p-3 rounded-3">
+                            <p class="small mb-1"><strong>👥 Personnes minimum :</strong> <?= $info['pers_min']; ?></p>
+                            <p class="small mb-1"><strong>🕒 Conditions :</strong> <?= $info['conditions']; ?></p>
+                            <p class="small mb-0"><strong>⚠️ Allergènes :</strong> <span class="text-danger"><?= $info['allergene']; ?></span></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex gap-2">
-                <?php foreach($info['galerie'] as $img) : ?>
-                    <img src="<?php echo $img; ?>" class="img-thumbnail rounded-3 thumb-gallery" style="width: 60px; height: 45px; object-fit: cover; cursor: pointer;" onclick="changeImg('<?php echo $id; ?>', '<?php echo $img; ?>')">
-                <?php endforeach; ?>
+
+            <div class="modal-footer border-0 bg-mimolette-light py-3">
+                <div class="d-flex justify-content-between align-items-center w-100 px-3">
+                    <div>
+                        <span class="text-muted small">Total pour <?= $info['pers_min']; ?> pers. min :</span>
+                        <h4 class="fw-bold text-cheddar mb-0">
+                            <?= ($info['prix_pers'] * $info['pers_min']); ?> €
+                        </h4>
+                    </div>
+                    <button type="button" class="btn btn-cheddar rounded-pill px-4 fw-bold shadow-sm">
+                        Réserver ce menu
+                    </button>
+                </div>
             </div>
         </div>
-
-        <div class="col-md-6">
-            <h6 class="fw-bold">Description :</h6>
-            <p class="small text-muted"><?php echo $info['description']; ?></p>
-            
-            <h6 class="fw-bold mt-3">Composition :</h6>
-            <ul class="small mb-3">
-                <?php foreach($info['plats'] as $plat): ?>
-                    <li><?php echo $plat; ?></li>
-                <?php endforeach; ?>
-            </ul>
-
-            <div class="bg-light p-3 rounded-3">
-                <p class="small mb-1"><strong>👥 Personnes minimum :</strong> <?php echo $info['pers_min']; ?></p>
-                <p class="small mb-1"><strong>🕒 Conditions :</strong> <?php echo $info['conditions']; ?></p>
-                <p class="small mb-0"><strong>⚠️ Allergènes :</strong> <span class="text-danger"><?php echo $info['allergene']; ?></span></p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal-footer border-0 bg-mimolette-light py-3">
-    <div class="d-flex justify-content-between align-items-center w-100 px-3">
-        <div>
-            <span class="text-muted small">Total pour <?php echo $info['pers_min']; ?> pers. min :</span>
-            <h4 class="fw-bold text-cheddar mb-0">
-                <?php echo ($info['prix_pers'] * $info['pers_min']); ?> €
-            </h4>
-        </div>
-        <button type="button" class="btn btn-cheddar rounded-pill px-4 fw-bold shadow-sm">
-            Réserver ce menu
-        </button>
     </div>
 </div>
 <?php endforeach; ?>
 
-  
-    <script src="styles/script/nos-menus.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="<?= $prefixe ?>styles/script/nos-menus.js"></script>
 </body>
 </html>
