@@ -1,0 +1,8 @@
+# 1. SÉCURITÉ : Bloquer le fichier de configuration de la BDD
+/backend/config.php
+
+# 2. Fichiers de configuration de l'éditeur et OS
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
