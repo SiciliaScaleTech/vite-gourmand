@@ -9,12 +9,13 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
     $total_articles = array_sum($_SESSION['panier']);
 }
 
-// Configuration automatique du préfixe selon le dossier
-if (strpos($_SERVER['SCRIPT_NAME'], '/employe/') !== false) {
-    $prefixe = '../';
-} else {
-    $prefixe = '';
-}
+// 1. AJOUTE ICI LE NOM EXACT DE TON DOSSIER DE PROJET (celui qui est dans htdocs ou www)
+// Exemple : Si ton dossier s'appelle "vite-et-gourmand", écris '/vite-et-gourmand/'
+$nom_du_projet = '/vite-et-gourmand/'; 
+
+// 2. Détermination du préfixe classique pour les fichiers CSS/Images
+$dossier_actuel = basename(dirname($_SERVER['SCRIPT_NAME']));
+$prefixe = ($dossier_actuel === 'employe') ? '../' : '';
 ?>
 
 <!DOCTYPE html>
@@ -60,7 +61,7 @@ if (strpos($_SERVER['SCRIPT_NAME'], '/employe/') !== false) {
                     
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <div class="dropdown">
-                            <a class="btn btn-outline-dark rounded-pill dropdown-toggle border-0 fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="btn btn-outline-dark rounded-pill dropdown-toggle border-0 fw-bold" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <?= htmlspecialchars($_SESSION['user_nom'] ?? 'Mon Compte') ?> 👤
                             </a>
                             
@@ -71,7 +72,7 @@ if (strpos($_SERVER['SCRIPT_NAME'], '/employe/') !== false) {
                                 
                                 <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['employe', 'admin'])): ?>
                                     <li>
-                                        <a class="dropdown-item py-2 fw-bold text-success" href="<?= $prefixe ?>employe/employe-dashboard.php">Mon dashboard</a>
+                                        <a class="dropdown-item py-2 fw-bold text-success" href="<?= $nom_du_projet ?>frontend/employe/employe-dashboard.php">Mon dashboard</a>
                                     </li>
                                 <?php else: ?>
                                     <li>

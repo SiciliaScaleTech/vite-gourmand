@@ -77,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="col-md-8">
             
             <div class="mb-4">
-                <a href="employe-dashboard.php" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                    ← Retour au tableau de bord
+                <a href="employe-carte.php" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    ← Retour à la carte
                 </a>
             </div>
 

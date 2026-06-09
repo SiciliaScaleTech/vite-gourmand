@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../backend/config.php'; // Ajuste le chemin si ton fichier est à la racine (retire les ../)
+require_once '../backend/config.php'; 
 
 // 1. Récupération de l'ID du menu dans l'URL
 if (!isset($_GET['id']) || empty($_GET['id'])) {

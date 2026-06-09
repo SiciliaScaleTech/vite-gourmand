@@ -2,63 +2,52 @@
 session_start();
 require_once '../../backend/config.php';
 
-// SÉCURITÉ : Accès réservé aux employés et admins
+// 1. 🛡️ SÉCURITÉ STRICTE
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
-    header('Location: ../index.php');
+    header('Location: ../connexion.php');
     exit();
 }
 
-$message = "";
-$commande_id = $_GET['id'] ?? null;
-
+$commande_id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 if (!$commande_id) {
     header('Location: employe-dashboard.php');
     exit();
 }
 
-// 1. TRAITEMENT DE LA MISE À JOUR DU STATUT (Formulaire soumis)
+$message = "";
+$messageClass = "";
+
+// 2. TRAITEMENT DU FORMULAIRE (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $nouveau_statut = $_POST['statut'];
     $mode_contact = trim($_POST['mode_contact'] ?? '');
     $motif_annulation = trim($_POST['motif_annulation'] ?? '');
 
-    // Exigence ECF : Bloquer l'annulation si le contact ou le motif est manquant
     if ($nouveau_statut === 'annulée' && (empty($mode_contact) || empty($motif_annulation))) {
-        $message = "<div class='alert alert-danger fw-bold'>⚠️ Erreur : Impossible d'annuler la commande sans spécifier le mode de contact (GSM/Mail) et le motif d'annulation.</div>";
+        $message = "⚠️ Erreur : Le mode de contact et le motif sont obligatoires pour une annulation.";
+        $messageClass = "alert-danger";
     } else {
         try {
-            // ÉTAPE PRÉALABLE : On récupère le statut actuel pour ne pas déduire les stocks deux fois
+            // Récupération de l'ancien statut avant modification
             $checkOld = $pdo->prepare("SELECT statut FROM commandes WHERE id = ?");
             $checkOld->execute([$commande_id]);
             $old_status = $checkOld->fetchColumn();
 
-            // TRANSACTION SQL : On sécurise le changement de statut ET la modification des stocks
             $pdo->beginTransaction();
 
-            // Si c'est une annulation, on enregistre le motif et le mode de contact
             if ($nouveau_statut === 'annulée') {
                 $stmt = $pdo->prepare("UPDATE commandes SET statut = ?, mode_contact = ?, motif_annulation = ? WHERE id = ?");
                 $stmt->execute([$nouveau_statut, $mode_contact, $motif_annulation, $commande_id]);
-                $message = "<div class='alert alert-warning fw-bold'>La commande a été annulée. Client contacté par " . htmlspecialchars($mode_contact) . ".</div>";
             } else {
-                // Statut classique (ex: accepté, en préparation, livré...)
                 $stmt = $pdo->prepare("UPDATE commandes SET statut = ?, mode_contact = NULL, motif_annulation = NULL WHERE id = ?");
                 $stmt->execute([$nouveau_statut, $commande_id]);
-                $message = "<div class='alert alert-success fw-bold'>Le statut de la commande a été mis à jour avec succès !</div>";
-                
-                // Alerte automatique si "en attente du retour de matériel"
-                if ($nouveau_statut === 'en attente du retour de matériel') {
-                    $message .= "<div class='alert alert-danger fw-bold mt-2'> ALERTE MATÉRIEL : Une notification par mail automatique a été simulée. Le client dispose de 10 jours ouvrés pour restituer le matériel sous peine d'une pénalité de 600€ (mentionné dans les CGV).</div>";
-                }
 
-                // LOGIQUE DES STOCKS : Si la commande passe à 'accepté' (et ne l'était pas déjà)
+                // Gestion des stocks lors du passage à "accepté"
                 if ($nouveau_statut === 'accepté' && $old_status !== 'accepté') {
-                    // Récupération des menus et quantités depuis la table details_commandes
                     $itemsStmt = $pdo->prepare("SELECT id_menu, quantite FROM details_commandes WHERE id_commande = ?");
                     $itemsStmt->execute([$commande_id]);
                     $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-                    // Soustraction des stocks dans la table menu
                     $updateStockStmt = $pdo->prepare("UPDATE menu SET stock = stock - ? WHERE id = ?");
                     foreach ($items as $item) {
                         $updateStockStmt->execute([$item['quantite'], $item['id_menu']]);
@@ -66,188 +55,182 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
                 }
             }
 
-            // Tout est bon, on valide la transaction en base de données
-            $pdo->commit();
+            // 📧 DÉCLENCHEMENT DU MAIL : En attente du retour de matériel
+            if ($nouveau_statut === 'en attente du retour de matériel' && $old_status !== 'en attente du retour de matériel') {
+                // On récupère les infos du client pour simuler l'envoi
+                $clientStmt = $pdo->prepare("SELECT u.email, u.prenom, u.nom FROM commandes c JOIN utilisateurs u ON c.id_utilisateur = u.id WHERE c.id = ?");
+                $clientStmt->execute([$commande_id]);
+                $client = $clientStmt->fetch(PDO::FETCH_ASSOC);
 
+                if ($client) {
+                    $to = $client['email'];
+                    $subject = "Restitution de matériel - Commande #" . $commande_id;
+                    $email_content = "Bonjour " . htmlspecialchars($client['prenom']) . ",\n\n"
+                                   . "Votre commande est désormais 'En attente du retour de matériel'.\n"
+                                   . "Conformément à nos conditions générales de vente, si sous 10 jours ouvrés le matériel n'est pas restitué, vous devrez vous acquitter de 600 euros de frais.\n\n"
+                                   . "Pour rendre le matériel, merci de prendre contact avec notre société au plus vite.\n\n"
+                                   . "Cordialement,\nL'équipe de Julie";
+                    
+                    // Décommente la ligne ci-dessous en production si ton serveur gère l'envoi de mail standard :
+                    // mail($to, $subject, $email_content, "From: no-reply@viteetgourmand.com");
+                    
+                    $message .= " Envoi du mail de relance matériel simulé avec succès à " . htmlspecialchars($to) . ".";
+                }
+            }
+
+            $pdo->commit();
+            $message = "Le statut de la commande a été mis à jour avec succès !" . $message;
+            $messageClass = "alert-success";
         } catch (PDOException $e) {
-            // En cas d'erreur, on annule tout pour éviter les décalages de stocks
             $pdo->rollBack();
-            $message = "<div class='alert alert-danger'>Erreur lors de la mise à jour : " . $e->getMessage() . "</div>";
+            $message = "Erreur BDD : " . $e->getMessage();
+            $messageClass = "alert-danger";
         }
     }
 }
 
-// 2. RÉCUPÉRATION DES INFOS DE LA COMMANDE
-$stmt = $pdo->prepare("SELECT c.*, u.nom, u.prenom, u.email, u.telephone 
-                        FROM commandes c 
-                        JOIN utilisateurs u ON c.id_utilisateur = u.id 
-                        WHERE c.id = ?");
-$stmt->execute([$commande_id]);
-$commande = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$commande) {
-    die("Commande introuvable.");
-}
-
-// RÉCUPÉRATION DES LIGNES : Sélection explicite pour éviter le conflit sur 'quantite' et 'stock'
+// 3. CHARGEMENT DES DONNÉES POUR L'AFFICHAGE
 try {
-    $detailsStmt = $pdo->prepare("SELECT dc.*, m.titre, m.stock AS stock_dispo 
+    $stmt = $pdo->prepare("SELECT c.*, u.nom, u.prenom, u.email, u.telephone 
+                           FROM commandes c 
+                           JOIN utilisateurs u ON c.id_utilisateur = u.id 
+                           WHERE c.id = ?");
+    $stmt->execute([$commande_id]);
+    $commande = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$commande) {
+        die("<div class='container py-5'><div class='alert alert-danger'>Commande introuvable.</div></div>");
+    }
+
+    // Récupération des détails avec le STOCK restant du menu
+    $detailsStmt = $pdo->prepare("SELECT dc.*, m.titre, m.stock AS stock_restant 
                                   FROM details_commandes dc 
                                   JOIN menu m ON dc.id_menu = m.id 
                                   WHERE dc.id_commande = ?");
     $detailsStmt->execute([$commande_id]);
     $liste_plats = $detailsStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Erreur lors de la récupération des détails : " . $e->getMessage());
+    die("Erreur BDD : " . $e->getMessage());
 }
 
 include '../includes/header.php';
 ?>
 
 <main class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <a href="employe-dashboard.php" class="btn btn-outline-secondary rounded-pill mb-4">⬅️ Retour au tableau de bord</a>
-            
+    <a href="employe-dashboard.php" class="btn btn-outline-secondary rounded-pill mb-4">⬅️ Retour au Tableau de Bord</a>
+    
+    <?php if (!empty($message)): ?>
+        <div class="alert <?= $messageClass ?> alert-dismissible fade show fw-bold" role="alert">
             <?= $message ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
 
-            <div class="card shadow border-0 mb-4">
-                <div class="card-body p-5">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                        <div>
-                            <h2 class="mb-0">Gestion de la Commande #<?= $commande['id'] ?></h2>
-                            <p class="text-muted mb-0">Passée le <?= date('d/m/Y à H:i', strtotime($commande['date_commande'])) ?></p>
-                        </div>
-                        <span class="badge bg-dark fs-5 px-3 py-2">Total : <?= number_format($commande['total'], 2, ',', ' ') ?> €</span>
-                    </div>
-
-                    <div class="row mb-4 bg-light p-3 rounded">
-                        <div class="col-md-6">
-                            <h5 class="text-muted border-bottom pb-1">Client</h5>
-                            <p class="mb-1 fw-bold"><?= htmlspecialchars($commande['prenom'] . ' ' . $commande['nom']) ?></p>
-                            <p class="mb-1 text-muted"><?= htmlspecialchars($commande['email']) ?></p>
-                            <p class="mb-0 text-muted"><?= htmlspecialchars($commande['telephone'] ?? 'Non renseigné') ?></p>
-                        </div>
-                        <div class="col-md-6">
-                            <h5 class="text-muted border-bottom pb-1">Adresse de livraison</h5>
-                            <p class="mb-0">
-                                <?= htmlspecialchars($commande['adresse'] ?? 'À emporter') ?><br>
-                                <?= htmlspecialchars($commande['code_postal'] ?? '') ?> <?= htmlspecialchars($commande['ville'] ?? '') ?>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="mb-5">
-                        <h4 class="mb-3 text-secondary">Articles commandés</h4>
-                        <div class="table-responsive">
-                            <table class="table table-bordered align-middle">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Nom du Menu</th>
-                                        <th class="text-center" style="width: 150px;">Quantité</th>
-                                        <th class="text-center" style="width: 150px;">Stock Réel</th>
-                                        <th class="text-end" style="width: 180px;">Prix Unitaire</th>
-                                        <th class="text-end" style="width: 180px;">Sous-total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (empty($liste_plats)): ?>
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted py-3">Aucun produit trouvé pour cette commande.</td>
-                                        </tr>
-                                    <?php else: ?>
-                                        <?php foreach ($liste_plats as $plat): ?>
-                                            <?php 
-                                            // Configuration des couleurs de l'alerte stock
-                                            $stock_status = ($plat['stock_dispo'] <= 0) ? 'badge bg-danger' : 'badge bg-success';
-                                            ?>
-                                            <tr>
-                                                <td class="fw-bold text-primary"><?= htmlspecialchars($plat['titre']) ?></td>
-                                                <td class="text-center fw-bold fs-5">x<?= htmlspecialchars($plat['quantite']) ?></td>
-                                                <td class="text-center">
-                                                    <span class="<?= $stock_status ?> fs-6 px-2 py-1">
-                                                        <?= htmlspecialchars($plat['stock_dispo']) ?> dispo(s)
-                                                    </span>
-                                                </td>
-                                                <td class="text-end"><?= number_format($plat['prix_unitaire'], 2, ',', ' ') ?> €</td>
-                                                <td class="text-end fw-bold"><?= number_format($plat['prix_unitaire'] * $plat['quantite'], 2, ',', ' ') ?> €</td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <?php if ($commande['statut'] === 'annulée'): ?>
-                        <div class="alert alert-dark border-0 shadow-sm p-4 mb-4">
-                            <h5 class="alert-heading fw-bold text-danger">Commande Annulée</h5>
-                            <p class="mb-1"><strong>Mode de contact utilisé :</strong> <?= htmlspecialchars($commande['mode_contact'] ?? 'Non spécifié') ?></p>
-                            <p class="mb-0"><strong>Motif de l'annulation :</strong> <?= htmlspecialchars($commande['motif_annulation'] ?? 'Non spécifié') ?></p>
-                        </div>
-                    <?php endif; ?>
-
-                    <form method="POST" class="mt-4 border-top pt-4">
-                        <h4 class="mb-3 text-secondary">Mettre à jour le flux de livraison</h4>
-                        
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Sélectionner le nouveau statut :</label>
-                            <select name="statut" id="statutSelect" class="form-select form-select-lg" onchange="toggleAnnulationBlock()">
-                                <option value="reçue" <?= $commande['statut'] === 'reçue' ? 'selected' : '' ?>>Reçue</option>
-                                <option value="accepté" <?= $commande['statut'] === 'accepté' ? 'selected' : '' ?>>Accepté (Validée par l'équipe)</option>
-                                <option value="en préparation" <?= $commande['statut'] === 'en préparation' ? 'selected' : '' ?>>En préparation (Cuisine)</option>
-                                <option value="en cours de livraison" <?= $commande['statut'] === 'en cours de livraison' ? 'selected' : '' ?>>En cours de livraison (Équipe logistique de Julie)</option>
-                                <option value="livré" <?= $commande['statut'] === 'livré' ? 'selected' : '' ?>>Livré (Remis au client)</option>
-                                <option value="en attente du retour de matériel" <?= $commande['statut'] === 'en attente du retour de matériel' ? 'selected' : '' ?>>En attente du retour de matériel (⚠️ Alerte CGV 600€)</option>
-                                <option value="terminée" <?= $commande['statut'] === 'terminée' ? 'selected' : '' ?>>Terminée</option>
-                                <option value="annulée" <?= $commande['statut'] === 'annulée' ? 'selected' : '' ?>>Annulée (⚠️ Justificatif requis)</option>
-                            </select>
-                        </div>
-
-                        <div id="blocAnnulation" class="card border-danger mb-4 d-none">
-                            <div class="card-header bg-danger text-white fw-bold">
-                                Justificatif d'annulation obligatoire (Appel ou Mail obligatoire avant action)
-                            </div>
-                            <div class="card-body bg-light">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Mode de contact utilisé :</label>
-                                    <select name="mode_contact" class="form-select">
-                                        <option value="">-- Choisir le mode de contact --</option>
-                                        <option value="Appel GSM">Appel GSM</option>
-                                        <option value="Email direct">Email direct</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Motif précis fourni au client :</label>
-                                    <textarea name="motif_annulation" class="form-control" rows="3" placeholder="Ex: Client a changé d'avis / Erreur de date lors de la commande..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" name="update_status" class="btn btn-dark btn-lg w-100 rounded-pill">Appliquer le nouveau statut</button>
-                    </form>
-
-                </div>
+    <div class="card shadow border-0 rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-0 fw-bold">Détails de la Commande #<?= $commande['id'] ?></h3>
+                <small class="text-light-50">Client : <?= htmlspecialchars($commande['prenom'] . ' ' . $commande['nom']) ?></small>
             </div>
+            <span class="badge bg-warning text-dark text-uppercase px-3 py-2 fw-bold"><?= htmlspecialchars($commande['statut']) ?></span>
+        </div>
+        
+        <div class="card-body p-4">
+            <h5 class="fw-bold text-secondary mb-3">Articles commandés & Stocks</h5>
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Menu</th>
+                            <th class="text-center">Quantité Commandée</th>
+                            <th class="text-center">Stock Actuel Restant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($liste_plats as $plat): ?>
+                            <tr>
+                                <td class="fw-bold"><?= htmlspecialchars($plat['titre']) ?></td>
+                                <td class="text-center fs-5 fw-bold text-primary">x<?= htmlspecialchars($plat['quantite']) ?></td>
+                                <td class="text-center">
+                                    <span class="badge <?= $plat['stock_restant'] > 5 ? 'bg-success' : 'bg-danger' ?> fs-6">
+                                        <?= htmlspecialchars($plat['stock_restant']) ?> en stock
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-light p-3 rounded-3 d-flex justify-content-between align-items-center mb-4 border border-2">
+                <span class="fs-5 fw-bold text-dark">Montant Total à régler :</span>
+                <span class="fs-3 fw-bold text-success"><?= number_format($commande['total'], 2, ',', ' ') ?> €</span>
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="fw-bold text-secondary mb-3">Mettre à jour le Statut de la Commande</h5>
+            <form method="POST" class="row g-3">
+                
+                <div class="col-12">
+                    <label class="form-label fw-bold">Sélectionnez le nouveau statut :</label>
+                    <select name="statut" id="statutSelect" class="form-select form-select-lg border-2" onchange="toggleAnnulationBlock()">
+                        <option value="reçue" <?= $commande['statut'] === 'reçue' ? 'selected' : '' ?>>Reçue (En attente de validation)</option>
+                        <option value="accepté" <?= $commande['statut'] === 'accepté' ? 'selected' : '' ?>>Accepté (Valide la commande & déduit les stocks)</option>
+                        <option value="en préparation" <?= $commande['statut'] === 'en préparation' ? 'selected' : '' ?>>En préparation (En cuisine)</option>
+                        <option value="en cours de livraison" <?= $commande['statut'] === 'en cours de livraison' ? 'selected' : '' ?>>En cours de livraison (Logistique Julie)</option>
+                        <option value="livré" <?= $commande['statut'] === 'livré' ? 'selected' : '' ?>>Livré (Remis au client)</option>
+                        <option value="en attente du retour de matériel" <?= $commande['statut'] === 'en attente du retour de matériel' ? 'selected' : '' ?>>En attente du retour de matériel (Alerte mail sous 10j - Frais 600€)</option>
+                        <option value="terminée" <?= $commande['statut'] === 'terminée' ? 'selected' : '' ?>>Terminée</option>
+                        <option value="annulée" <?= $commande['statut'] === 'annulée' ? 'selected' : '' ?>>Annulée</option>
+                    </select>
+                </div>
+
+                <div id="blocAnnulation" class="col-12 d-none">
+                    <div class="card border-danger bg-light-danger p-3 rounded-3">
+                        <h6 class="text-danger fw-bold mb-2">⚠️ Informations d'annulation requises :</h6>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Mode de contact :</label>
+                                <select name="mode_contact" class="form-select border-danger">
+                                    <option value="">-- Choisir --</option>
+                                    <option value="Appel GSM" <?= ($commande['mode_contact'] ?? '') === 'Appel GSM' ? 'selected' : '' ?>>Appel GSM</option>
+                                    <option value="Email direct" <?= ($commande['mode_contact'] ?? '') === 'Email direct' ? 'selected' : '' ?>>Email direct</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label small fw-bold">Motif de l'annulation :</label>
+                                <textarea name="motif_annulation" class="form-control border-danger" rows="2" placeholder="Expliquez pourquoi la commande est annulée..."><?= htmlspecialchars($commande['motif_annulation'] ?? '') ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-4">
+                    <button type="submit" name="update_status" class="btn btn-dark btn-lg w-100 rounded-pill fw-bold fs-5 shadow-sm">
+                        Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+
         </div>
     </div>
 </main>
 
 <script>
-// Script JS pour afficher dynamiquement le bloc d'annulation si "annulée" est sélectionné
+// Fonction JS pour afficher/masquer le bloc d'annulation en temps réel
 function toggleAnnulationBlock() {
     const select = document.getElementById('statutSelect');
     const bloc = document.getElementById('blocAnnulation');
     
-    if (select && bloc) {
-        if (select.value === 'annulée') {
-            bloc.classList.remove('d-none');
-        } else {
-            bloc.classList.add('d-none');
-        }
+    if (select.value === 'annulée') {
+        bloc.classList.remove('d-none');
+    } else {
+        bloc.classList.add('d-none');
     }
 }
-// Lancement au chargement de la page
+
+// Lancement automatique au chargement initial de la page si la commande était déjà enregistrée en tant qu'annulée
 document.addEventListener("DOMContentLoaded", toggleAnnulationBlock);
 </script>
 
