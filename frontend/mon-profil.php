@@ -25,6 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         // La requête SQL utilise maintenant le nom exact de tes colonnes
         $stmt = $pdo->prepare("UPDATE utilisateurs SET nom = ?, prenom = ?, email = ?, telephone = ?, adresse = ?, code_postal = ?, ville = ? WHERE id = ?");
         $stmt->execute([$nom, $prenom, $email, $telephone, $adresse, $code_postal, $ville, $user_id]);
+        
+        // Optionnel : Mettre à jour la session si le prénom a changé pour éviter le bug d'affichage du header
+        $_SESSION['user_prenom'] = $prenom;
+        
         $message = "<div class='alert alert-success'>Informations mises à jour avec succès !</div>";
     } catch (PDOException $e) {
         $message = "<div class='alert alert-danger'>Erreur : L'adresse email est déjà utilisée par un autre compte.</div>";
@@ -103,11 +107,22 @@ include 'includes/header.php';
 
                         <div class="d-grid gap-2">
                             <button type="submit" name="update_profile" class="btn btn-primary rounded-pill fw-bold">Enregistrer les modifications</button>
-                            <hr class="my-3">
-                            <a href="contact.php" class="btn btn-outline-dark rounded-pill">
-                                ✉️ Un problème ? Nous contacter directement
-                            </a>
-                        </div>
+                            
+                            <!-- BOUTON : Accès direct au Dashboard pour Julie / Admin -->
+                            <?php if (in_array($user['role'] ?? '', ['employe', 'admin'])): ?>
+                                <a href="employe-dashboard.php" class="btn btn-dark rounded-pill fw-bold mt-2 shadow-sm">
+                                    Accéder au Tableau de Bord Professionnel
+                                </a>
+                            <?php endif; ?>
+
+                            <!-- 🔒 CONDITION INVERSÉE : On affiche "Nous contacter" UNIQUEMENT pour les clients normaux -->
+                            <?php if (!in_array($user['role'] ?? '', ['employe', 'admin'])): ?>
+                                <hr class="my-3">
+                                <a href="contact.php" class="btn btn-outline-dark rounded-pill">
+                                    ✉️ Un problème ? Nous contacter directement
+                                </a>
+                            <?php endif; ?>
+                    </div>
                     </form>
 
                 </div>

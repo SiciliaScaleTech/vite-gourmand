@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Connexion réussie ! On stocke les infos en session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_nom'] = $user['prenom'];
+        $_SESSION['user_role'] = $user['role'];
         
         header("Location: index.php"); // Redirection vers l'accueil
         exit();
