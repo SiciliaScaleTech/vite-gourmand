@@ -2,7 +2,7 @@
 session_start();
 require_once '../../backend/config.php';
 
-// 🛡️ SÉCURITÉ : Accès réservé aux employés et admins
+// SÉCURITÉ : Accès réservé aux employés et admins
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
     header('Location: ../index.php');
     exit();
@@ -121,7 +121,7 @@ include '../includes/header.php';
                             </div>
 
                             <hr class="my-3 text-muted">
-                            <h5 class="text-primary fw-bold mb-2">🍽️ Composition du Menu</h5>
+                            <h5 class="text-primary fw-bold mb-2"> Composition du Menu</h5>
                             
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Entrée</label>

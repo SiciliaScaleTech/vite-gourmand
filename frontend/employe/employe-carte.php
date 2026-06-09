@@ -2,7 +2,7 @@
 session_start();
 require_once '../../backend/config.php';
 
-// 🛡️ SÉCURITÉ : Accès réservé aux employés et admins
+// SÉCURITÉ : Accès réservé aux employés et admins
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
     header('Location: ../index.php');
     exit();
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['em
 
 $message = "";
 
-// Récupération d'un éventuel message flash de succès (provenant de l'ajout)
+// Récupération d'un éventuel message flash de succès
 if (isset($_SESSION['flash_success'])) {
     $message = "<div class='alert alert-success fw-bold'>" . $_SESSION['flash_success'] . "</div>";
     unset($_SESSION['flash_success']);
@@ -74,7 +74,7 @@ include '../includes/header.php';
                                 <?php if (empty($menus)): ?>
                                     <tr>
                                         <td colspan="7" class="text-center py-5 text-muted">
-                                            <p class="fs-4 mb-1">La carte est vide 🍽️</p>
+                                            <p class="fs-4 mb-1">La carte est vide </p>
                                             <p class="mb-0">Clique sur "Ajouter un menu / plat" pour commencer.</p>
                                         </td>
                                     </tr>
@@ -86,7 +86,7 @@ include '../includes/header.php';
                                                     $galerie_images = !empty($m['galerie']) ? explode('|', $m['galerie']) : [];
                                                     $image_vignette = !empty($galerie_images[0]) ? $galerie_images[0] : 'assets/images/pizza-placeholder.jpg';
                                                     
-                                                    // 🔀 AJUSTEMENT DU CHEMIN POUR LE SOUS-DOSSIER EMPLOYE
+                                                    // AJUSTEMENT DU CHEMIN POUR LE SOUS-DOSSIER EMPLOYE
                                                     // Si le chemin ne commence pas déjà par http ou par ../, on rajoute ../
                                                     $chemin_image_vignette = "../" . $image_vignette;
                                                 ?>
@@ -122,11 +122,11 @@ include '../includes/header.php';
                                             <td class="fw-bold text-success"><?= number_format($m['prix_pers'], 2, ',', ' ') ?> €</td>
                                             <td class="text-center pe-3">
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <a href="employe-modifier-menu.php?id=<?= $m['id'] ?>" class="btn btn-sm btn-outline-dark rounded-pill px-3">✏️ Modifier</a>
+                                                    <a href="employe-modification-menu.php?id=<?= $m['id'] ?>" class="btn btn-sm btn-outline-dark rounded-pill px-3">Modifier</a>
                                                     <a href="employe-carte.php?delete_id=<?= $m['id'] ?>" 
                                                        class="btn btn-sm btn-danger rounded-pill px-3" 
                                                        onclick="return confirm('Supprimer définitivement le menu « <?= htmlspecialchars($m['titre']) ?> » ?');">
-                                                        🗑️ Supprimer
+                                                        Supprimer
                                                     </a>
                                                 </div>
                                             </td>

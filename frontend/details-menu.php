@@ -36,7 +36,7 @@ include 'includes/header.php';
             <div class="card shadow border-0 rounded-4 overflow-hidden">
                 <div class="row g-0">
                     
-                    <!-- Colonne Image (Galerie) -->
+                    
                     <div class="col-md-6">
                         <?php 
                             $galerie = !empty($menu['galerie']) ? explode('|', $menu['galerie']) : [];
@@ -45,7 +45,7 @@ include 'includes/header.php';
                         <img src="<?= htmlspecialchars($image_principale) ?>" class="img-fluid w-100 h-100" style="object-fit: cover; min-height: 350px;" alt="<?= htmlspecialchars($menu['titre']) ?>">
                     </div>
 
-                    <!-- Colonne Infos -->
+                   
                     <div class="col-md-6 p-5 d-flex flex-column justify-content-between">
                         <div>
                             <span class="badge bg-primary text-uppercase mb-2"><?= htmlspecialchars($menu['categorie']) ?></span>
@@ -59,19 +59,15 @@ include 'includes/header.php';
                                 <ul class="list-unstyled mb-0 small text-dark">
                                     <?php 
                                     if (!empty($menu['plats'])) {
-                                        // On découpe par rapport aux barres verticales '|'
                                         $liste_plats = explode('|', $menu['plats']);
 
                                         foreach ($liste_plats as $un_plat) {
                                             $un_plat = trim($un_plat);
                                             
                                             if (!empty($un_plat)) {
-                                                // On cherche s'il y a un ":" pour isoler "Entrée", "Plat" ou "Dessert"
                                                 if (strpos($un_plat, ':') !== false) {
-                                                    // On sépare en deux morceaux : avant le ":" et après le ":"
                                                     list($titre, $details) = explode(':', $un_plat, 2);
                                                     
-                                                    // On affiche le titre en gras et le détail en normal
                                                     echo "<li class='mb-2'><strong class='text-capitalize'>" . htmlspecialchars(trim($titre)) . " :</strong>" . htmlspecialchars($details) . "</li>";
                                                 } else {
                                                     // Si jamais un plat n'a pas de ":", on l'affiche normalement
@@ -112,7 +108,9 @@ include 'includes/header.php';
                             <?php if ($menu['stock'] <= 0): ?>
                                 <button class="btn btn-secondary btn-lg rounded-pill px-4 fw-bold shadow-sm" disabled>Indisponible</button>
                             <?php else: ?>
-                                <button class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm">Réserver ce menu</button>
+                                <a href="ajouter-panier.php?id=<?= $menu['id'] ?>" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                                    Réserver ce menu
+                                </a>
                             <?php endif; ?>
                         </div>
 
