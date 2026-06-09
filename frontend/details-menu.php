@@ -1,5 +1,3 @@
-<?php include 'includes/header.php'; ?>
-
 <?php
 require_once '../backend/config.php';
 
