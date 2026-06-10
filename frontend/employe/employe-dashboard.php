@@ -2,184 +2,142 @@
 session_start();
 require_once '../../backend/config.php';
 
-// 1. SÉCURITÉ : Vérification du rôle Employé ou Admin
+// 1. 🛡️ SÉCURITÉ STRICTE
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
-    header('Location: ../index.php');
+    header('Location: ../connexion.php');
     exit();
 }
 
-// Vérification de la présence de l'ID de la commande
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header('Location: employe-dashboard.php');
-    exit();
-}
+// 🎨 LE CODE COULEUR DES STATUTS (Classes Bootstrap)
+$couleurs_statut = [
+    'reçue' => 'bg-secondary text-white',
+    'accepté' => 'bg-info text-dark',
+    'en préparation' => 'bg-warning text-dark',
+    'en cours de livraison' => 'bg-primary text-white',
+    'livré' => 'bg-success text-white',
+    'en attente du retour de matériel' => 'bg-danger text-white fw-bold animate-pulse',
+    'terminée' => 'bg-dark text-white',
+    'annulée' => 'bg-light text-danger border border-danger'
+];
 
-$commande_id = (int)$_GET['id'];
-$message = "";
-$messageClass = "";
-
-// 2. TRAITEMENT DU CHANGEMENT DE STATUT (Formulaire POST)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nouveau_statut'])) {
-    $nouveau_statut = trim($_POST['nouveau_statut']);
+// 2. TRAITEMENT DE LA SUPPRESSION
+if (isset($_GET['action']) && $_GET['action'] === 'supprimer' && isset($_GET['id_commande'])) {
+    $id_a_supprimer = (int)$_GET['id_commande'];
     
     try {
-        // On récupère le statut actuel de la commande avant modification pour éviter les doublons de baisse de stock
-        $checkOld = $pdo->prepare("SELECT statut FROM commandes WHERE id = ?");
-        $checkOld->execute([$commande_id]);
-        $old_status = $checkOld->fetchColumn();
-
-        // TRANSACTION SQL : On sécurise pour que le statut ET le stock changent ensemble sans bug
         $pdo->beginTransaction();
-
-        // Étape A : Mise à jour du statut de la commande
-        $updateStmt = $pdo->prepare("UPDATE commandes SET statut = ? WHERE id = ?");
-        $updateStmt->execute([$nouveau_statut, $commande_id]);
-
-        // Étape B :  SI LA COMMANDE PASSE À 'ACCEPTÉ' (Et qu'elle ne l'était pas déjà) -> ON BAISSE LES STOCKS
-        if ($nouveau_statut === 'accepté' && $old_status !== 'accepté') {
-            
-            //  On récupère les plats/menus liés à cette commande
-            // (Note : Ajuste le nom de la table 'commande_details' si elle s'appelle autrement en BDD)
-            $itemsStmt = $pdo->prepare("SELECT id_menu, quantite FROM commande_details WHERE id_commande = ?");
-            $itemsStmt->execute([$commande_id]);
-            $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Requête pour retirer la quantité vendue du stock du menu
-            $updateStockStmt = $pdo->prepare("UPDATE menu SET stock = stock - ? WHERE id = ?");
-
-            foreach ($items as $item) {
-                $updateStockStmt->execute([$item['quantite'], $item['id_menu']]);
-            }
-        }
-
-        // Si tout s'est bien passé, on valide la transaction en base de données
+        
+        $deleteDetails = $pdo->prepare("DELETE FROM details_commandes WHERE id_commande = ?");
+        $deleteDetails->execute([$id_a_supprimer]);
+        
+        $deleteCmd = $pdo->prepare("DELETE FROM commandes WHERE id = ?");
+        $deleteCmd->execute([$id_a_supprimer]);
+        
         $pdo->commit();
-        $message = "Le statut de la commande a été mis à jour avec succès !";
-        $messageClass = "alert-success";
-
+        header('Location: employe-dashboard.php?msg=deleted');
+        exit();
     } catch (PDOException $e) {
-        // En cas d'erreur de BDD, on annule tout pour ne pas fausser les stocks
         $pdo->rollBack();
-        $message = "Erreur lors de la mise à jour : " . $e->getMessage();
-        $messageClass = "alert-danger";
+        die("Erreur lors de la suppression : " . $e->getMessage());
     }
 }
 
-// 3. RÉCUPÉRATION DES INFOS DE LA COMMANDE ET DU CLIENT POUR L'AFFICHAGE
+// 3. RÉCUPÉRATION DE TOUTES LES COMMANDES
 try {
-    $cmdStmt = $pdo->prepare("SELECT c.*, u.nom, u.prenom, u.email, u.telephone 
-                              FROM commandes c 
-                              JOIN utilisateurs u ON c.id_utilisateur = u.id 
-                              WHERE c.id = ?");
-    $cmdStmt->execute([$commande_id]);
-    $commande = $cmdStmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$commande) {
-        die("Commande introuvable.");
-    }
-
-    // Récupération des lignes de la commande (les plats achetés)
-    $detailsStmt = $pdo->prepare("SELECT cd.*, m.titre, m.prix_pers 
-                                  FROM commande_details cd 
-                                  JOIN menu m ON cd.id_menu = m.id 
-                                  WHERE cd.id_commande = ?");
-    $detailsStmt->execute([$commande_id]);
-    $liste_plats = $detailsStmt->fetchAll(PDO::FETCH_ASSOC);
-
+    $stmt = $pdo->query("SELECT c.*, u.nom, u.prenom 
+                         FROM commandes c 
+                         JOIN utilisateurs u ON c.id_utilisateur = u.id 
+                         ORDER BY c.date_commande DESC");
+    $commandes = $stmt->fetchAll();
 } catch (PDOException $e) {
-    die("Erreur BDD : " . $e->getMessage());
+    die("Erreur lors de la récupération des commandes : " . $e->getMessage());
 }
 
 include '../includes/header.php';
 ?>
 
 <main class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
+    <!-- En-tête du Dashboard avec le titre, le badge et les boutons regroupés à gauche -->
+    <div class="mb-5">
+        <h1 class="fw-bold mb-2">Tableau de bord - Employé</h1>
+        
+        <!-- Barre d'alignement horizontal pour le badge et les boutons -->
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <span class="badge bg-dark px-3 py-2 me-2">Espace Julie</span>
             
-            <a href="employe-dashboard.php" class="btn btn-outline-secondary rounded-pill mb-4">⬅️ Retour au Dashboard</a>
+            <!-- BOUTON GESTION DE LA CARTE -->
+            <a href="employe-carte.php" class="btn btn-sm btn-dark border-0 rounded-pill px-3 py-2 fw-bold shadow-sm">
+                Gestion de la Carte
+            </a>
 
-            <?php if (!empty($message)): ?>
-                <div class="alert <?= $messageClass ?> alert-dismissible fade show" role="alert">
-                    <?= $message ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
+            <!-- BOUTON GESTION DES AVIS -->
+            <a href="employe-avis.php" class="btn btn-sm btn-warning border-0 rounded-pill px-3 py-2 fw-bold shadow-sm text-dark">
+                Gérer les Avis Clients
+            </a>
+        </div>
+    </div>
 
-            <div class="card shadow border-0 rounded-4 overflow-hidden mb-4">
-                <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h3 class="mb-0 fw-bold">Gestion Commande #<?= $commande['id'] ?></h3>
-                        <small class="text-light-50">Passée le <?= date('d/m/Y à H:i', strtotime($commande['date_commande'])) ?></small>
-                    </div>
-                    <span class="badge bg-primary text-uppercase px-3 py-2"><?= htmlspecialchars($commande['statut']) ?></span>
-                </div>
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'deleted'): ?>
+        <div class="alert alert-success alert-dismissible fade show fw-bold" role="alert">
+            🗑️ La commande a été supprimée avec succès.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
 
-                <div class="card-body p-4">
-                    <div class="row g-4">
-                        <div class="col-md-6 border-end">
-                            <h5 class="fw-bold text-secondary mb-3">👤 Informations Client</h5>
-                            <p class="mb-1"><strong>Nom complet :</strong> <?= htmlspecialchars($commande['prenom'] . ' ' . $commande['nom']) ?></p>
-                            <p class="mb-1"><strong>Téléphone :</strong> <?= htmlspecialchars($commande['telephone'] ?? 'Non renseigné') ?></p>
-                            <p class="mb-0"><strong>Email :</strong> <?= htmlspecialchars($commande['email']) ?></p>
-                        </div>
-
-                        <div class="col-md-6 ps-md-4">
-                            <h5 class="fw-bold text-secondary mb-3">Modifier le Statut</h5>
-                            <form method="POST" action="employe-details-commande.php?id=<?= $commande_id ?>" class="row g-2 align-items-center">
-                                <div class="col-8">
-                                    <select name="nouveau_statut" class="form-select">
-                                        <option value="reçue" <?= $commande['statut'] === 'reçue' ? 'selected' : '' ?>>Reçue</option>
-                                        <option value="accepté" <?= $commande['statut'] === 'accepté' ? 'selected' : '' ?>>Accepté</option>
-                                        <option value="en préparation" <?= $commande['statut'] === 'en préparation' ? 'selected' : '' ?>>En préparation</option>
-                                        <option value="en cours de livraison" <?= $commande['statut'] === 'en cours de livraison' ? 'selected' : '' ?>>En cours de livraison</option>
-                                        <option value="livré" <?= $commande['statut'] === 'livré' ? 'selected' : '' ?>>Livré</option>
-                                        <option value="en attente du retour de matériel" <?= $commande['statut'] === 'en attente du retour de matériel' ? 'selected' : '' ?>>En attente du retour de matériel</option>
-                                        <option value="terminée" <?= $commande['statut'] === 'terminée' ? 'selected' : '' ?>>Terminée</option>
-                                        <option value="annulée" <?= $commande['statut'] === 'annulée' ? 'selected' : '' ?>>Annulée</option>
-                                    </select>
-                                </div>
-                                <div class="col-4">
-                                    <button type="submit" class="btn btn-dark w-100 rounded-pill fw-bold">Mettre à jour</button>
-                                </div>
-                            </form>
-                            <div class="form-text text-muted mt-2">Passer le statut à "Accepté" réduira automatiquement les stocks des menus associés.</div>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <h5 class="fw-bold text-secondary mb-3">Contenu de la commande</h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle">
-                            <thead class="table-light">
+    <div class="card shadow border-0 rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="p-3">N° Commande</th>
+                            <th>Client</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Statut</th>
+                            <th class="text-center p-3" style="width: 220px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($commandes)): ?>
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">Aucune commande pour le moment.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($commandes as $c): ?>
+                                <?php 
+                                    // On récupère la couleur associée au statut actuel, ou gris par défaut si inconnu
+                                    $classe_couleur = $couleurs_statut[$c['statut']] ?? 'bg-secondary text-white';
+                                ?>
                                 <tr>
-                                    <th>Menu</th>
-                                    <th class="text-center">Prix Unitaire</th>
-                                    <th class="text-center">Quantité</th>
-                                    <th class="text-end">Total</th>
+                                    <td class="p-3 fw-bold">#<?= $c['id'] ?></td>
+                                    <td><?= htmlspecialchars($c['prenom'] . ' ' . $c['nom']) ?></td>
+                                    <td><?= date('d/m/Y H:i', strtotime($c['date_commande'])) ?></td>
+                                    <td class="fw-bold"><?= number_format($c['total'], 2, ',', ' ') ?> €</td>
+                                    <td>
+                                        <span class="badge <?= $classe_couleur ?> text-uppercase px-3 py-2 shadow-sm" style="font-size: 0.85rem;">
+                                            <?= htmlspecialchars($c['statut']) ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-center p-3">
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <a href="employe-details-commande.php?id=<?= $c['id'] ?>" 
+                                               class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold">
+                                                Modifier
+                                            </a>
+                                            <a href="employe-dashboard.php?action=supprimer&id_commande=<?= $c['id'] ?>" 
+                                               class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement la commande #<?= $c['id'] ?> ?');">
+                                                Supprimer
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead class="table-light">
-                            <tbody>
-                                <?php foreach ($liste_plats as $plat): ?>
-                                    <tr>
-                                        <td class="fw-bold"><?= htmlspecialchars($plat['titre']) ?></td>
-                                        <td class="text-center"><?= number_format($plat['prix_pers'], 2, ',', ' ') ?> €</td>
-                                        <td class="text-center">x<?= htmlspecialchars($plat['quantite']) ?></td>
-                                        <td class="text-end fw-bold"><?= number_format($plat['prix_pers'] * $plat['quantite'], 2, ',', ' ') ?> €</td>
-                                    </tr>
-                                <?php endforeach; ?>
-                                <tr class="table-dark">
-                                    <td colspan="3" class="text-end fw-bold">Montant total de la commande :</td>
-                                    <td class="text-end fw-bold"><?= number_format($commande['total'], 2, ',', ' ') ?> €</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
-
         </div>
     </div>
 </main>
