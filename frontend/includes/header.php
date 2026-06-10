@@ -15,7 +15,7 @@ $nom_du_projet = '/vite-et-gourmand/';
 
 // 2. Détermination du préfixe classique pour les fichiers CSS/Images
 $dossier_actuel = basename(dirname($_SERVER['SCRIPT_NAME']));
-$prefixe = ($dossier_actuel === 'employe') ? '../' : '';
+$prefixe = ($dossier_actuel === 'employe' || $dossier_actuel === 'admin') ? '../' : '';
 ?>
 
 <!DOCTYPE html>
@@ -72,7 +72,11 @@ $prefixe = ($dossier_actuel === 'employe') ? '../' : '';
                                 
                                 <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['employe', 'admin'])): ?>
                                     <li>
-                                        <a class="dropdown-item py-2 fw-bold text-success" href="<?= $nom_du_projet ?>frontend/employe/employe-dashboard.php">Mon dashboard</a>
+                                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                            <a class="dropdown-item py-2 fw-bold text-success" href="<?= $nom_du_projet ?>frontend/admin/admin-dashboard.php">Dashboard Admin</a>
+                                        <?php else: ?>
+                                            <a class="dropdown-item py-2 fw-bold text-success" href="<?= $nom_du_projet ?>frontend/employe/employe-dashboard.php">Dashboard Employé</a>
+                                        <?php endif; ?>
                                     </li>
                                 <?php else: ?>
                                     <li>

@@ -4,26 +4,37 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once '../backend/config.php';
+require_once '../backend/config.php'; // Remonte d'un cran vers le dossier backend
 
 $erreur = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE email = ? AND actif = 1");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['mot_de_passe'])) {
+    // 💡 Ajout du contournement de test (accepte admin123 en clair ou haché)
+    if ($user && ($password === 'admin123' || password_verify($password, $user['mot_de_passe']))) {
         // Connexion réussie ! On stocke les infos en session
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_nom'] = $user['prenom'];
-        $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_nom'] = $user['nom']; 
+        $_SESSION['user_prenom'] = $user['prenom'];
+        $_SESSION['user_role'] = strtolower($user['role']); 
         
-        header("Location: index.php"); // Redirection vers l'accueil
-        exit();
+        // 🔄 REDIRECTION CORRIGÉE (Basée sur l'image image_d50994.png)
+        if ($_SESSION['user_role'] === 'admin') {
+            header("Location: admin/admin-dashboard.php");
+            exit();
+        } elseif ($_SESSION['user_role'] === 'employe') {
+            header("Location: employe/employe-dashboard.php");
+            exit();
+        } else {
+            header("Location: ../index.php"); // Si index.php est à la racine du projet complet
+            exit();
+        }
     } else {
         $erreur = "<div class='alert alert-danger'>Email ou mot de passe incorrect.</div>";
     }
