@@ -55,8 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (mail($to, $subject, $body, $headers)) {
         header("Location: contact.php?status=success");
     } else {
-        // Si le mail échoue mais que la BDD a réussi, on peut quand même dire "success" 
-        // ou préciser "success_db_only"
+        
         header("Location: contact.php?status=success");
     }
     exit;

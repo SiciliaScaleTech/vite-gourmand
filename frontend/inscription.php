@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ville = trim($_POST['ville']);
     $password_brut = $_POST['password'];
 
-    // 🛡️ REGEX SÉCURITÉ MOT DE PASSE (10 car. min, 1 maj, 1 min, 1 chiffre, 1 car. spécial)
+    //  MOT DE PASSE (10 car. min, 1 maj, 1 min, 1 chiffre, 1 car. spécial)
     $regex_password = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_#])[A-Za-z\d@$!%*?&_#]{10,}$/';
 
     if (!preg_match($regex_password, $password_brut)) {

@@ -131,7 +131,7 @@ include 'includes/header.php';
                 </div>
             </div>
 
-            <!-- FORMULAIRE 2 : LAISSER UN AVIS (Complètement séparé pour éviter le conflit HTML) -->
+            <!-- FORMULAIRE 2 : LAISSER UN AVIS  -->
             <div class="card shadow border-0 mt-4">
                 <div class="card-body p-4">
                     <h4 class="mb-3 text-secondary">Laisser un avis sur notre service</h4>

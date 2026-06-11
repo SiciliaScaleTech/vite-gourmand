@@ -1,12 +1,12 @@
 // Cette partie permet de lancer le filtre automatiquement 
-// quand tu reviens sur la page ou après avoir cliqué sur "Actualiser"
+
 document.addEventListener("DOMContentLoaded", function() {
     console.log("Page chargée, lancement du filtre...");
     filterMenus();
 });
 
 function filterMenus() {
-    // 1. Récupération sécurisée des éléments (on vérifie s'ils existent pour éviter les erreurs)
+    // 1. Récupération sécurisée des éléments 
     const themeSelect = document.querySelector('select[name="theme"]');
     const prixInput = document.querySelector('input[name="prix_max"]');
     const persInput = document.querySelector('input[name="pers_min"]');

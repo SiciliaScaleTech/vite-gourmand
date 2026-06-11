@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['panier'])) {
 }
 
 try {
-    $pdo->beginTransaction(); // On démarre une transaction pour être sûr que tout s'enregistre ou rien du tout
+    $pdo->beginTransaction(); // On démarre une transaction 
 
     // 1. Calcul du total (on récupère les prix en BDD)
     $total_commande = 0;

@@ -1,5 +1,5 @@
 <?php
-// Inclure ta config si ce n'est pas déjà fait sur ton index
+
 require_once '../backend/config.php'; 
 
 // Récupérer les 5 derniers avis VALIDÉS uniquement
@@ -73,7 +73,6 @@ $avis_valides = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h2 class="mb-4 fw-bold">Ce que disent nos clients </h2>
         
         <?php if (empty($avis_valides)): ?>
-            <!-- Message de secours si Julie n'a pas encore validé d'avis -->
             <p class="text-muted fs-5">Aucun avis disponible pour le moment. Soyez le premier à en laisser un !</p>
         <?php else: ?>
             

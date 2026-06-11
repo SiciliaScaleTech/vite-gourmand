@@ -1,4 +1,4 @@
-/* Variables pour réutiliser tes couleurs partout */
+
 :root {
     --mimolette: #FFE699;
     --cheddar: #ED9D36;
@@ -92,7 +92,7 @@ footer {
 }
 
 .bg-mimolette-light {
-    background-color: #fffcf2; /* Jaune très pâle pour les avis */
+    background-color: #fffcf2; 
     border-radius: 20px;
 }
 
@@ -102,13 +102,12 @@ footer {
 }
 
 .alert-cheddar {
-    background-color: #ffb703; /* Ton orange/jaune principal */
-    color: #1a1a1a;            /* Texte sombre pour le contraste */
-    border-left: 5px solid #fb8500; /* Une petite barre plus foncée sur le côté */
-    border-radius: 15px;       /* Des bords arrondis pour rester dans ton style "Gourmand" */
+    background-color: #ffb703; 
+    color: #1a1a1a;            
+    border-left: 5px solid #fb8500; 
+    border-radius: 15px;       
 }
 
-/* On stylise aussi le lien à l'intérieur */
 .alert-cheddar a {
     color: #000;
     text-decoration: underline;

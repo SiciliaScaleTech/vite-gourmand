@@ -79,10 +79,10 @@ include '../includes/header.php';
 
                                     <div class="d-flex gap-2 justify-content-end">
                                         <a href="employe-avis.php?action=refuser&id=<?= $av['id'] ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="return confirm('Refuser cet avis ?');">
-                                            ❌ Refuser
+                                             Refuser
                                         </a>
                                         <a href="employe-avis.php?action=accepter&id=<?= $av['id'] ?>" class="btn btn-sm btn-success rounded-pill px-3">
-                                            ✅ Valider pour l'accueil
+                                            Valider pour l'accueil
                                         </a>
                                     </div>
                                 </div>

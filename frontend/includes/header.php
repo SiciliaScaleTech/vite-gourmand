@@ -9,8 +9,6 @@ if (isset($_SESSION['panier']) && !empty($_SESSION['panier'])) {
     $total_articles = array_sum($_SESSION['panier']);
 }
 
-// 1. AJOUTE ICI LE NOM EXACT DE TON DOSSIER DE PROJET (celui qui est dans htdocs ou www)
-// Exemple : Si ton dossier s'appelle "vite-et-gourmand", écris '/vite-et-gourmand/'
 $nom_du_projet = '/vite-et-gourmand/'; 
 
 // 2. Détermination du préfixe classique pour les fichiers CSS/Images
@@ -62,7 +60,7 @@ $prefixe = ($dossier_actuel === 'employe' || $dossier_actuel === 'admin') ? '../
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <div class="dropdown">
                             <a class="btn btn-outline-dark rounded-pill dropdown-toggle border-0 fw-bold" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <?= htmlspecialchars($_SESSION['user_nom'] ?? 'Mon Compte') ?> 👤
+                                <?= htmlspecialchars($_SESSION['user_prenom'] ?? 'Mon Compte') ?> 👤
                             </a>
                             
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">

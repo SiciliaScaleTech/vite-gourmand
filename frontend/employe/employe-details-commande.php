@@ -2,7 +2,7 @@
 session_start();
 require_once '../../backend/config.php';
 
-// 1. 🛡️ SÉCURITÉ STRICTE
+// 1. SÉCURITÉ STRICTE
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
     header('Location: ../connexion.php');
     exit();
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
                 }
             }
 
-            // 📧 DÉCLENCHEMENT DU MAIL : En attente du retour de matériel
+            // DÉCLENCHEMENT DU MAIL : En attente du retour de matériel
             if ($nouveau_statut === 'en attente du retour de matériel' && $old_status !== 'en attente du retour de matériel') {
                 // On récupère les infos du client pour simuler l'envoi
                 $clientStmt = $pdo->prepare("SELECT u.email, u.prenom, u.nom FROM commandes c JOIN utilisateurs u ON c.id_utilisateur = u.id WHERE c.id = ?");
@@ -70,9 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
                                    . "Conformément à nos conditions générales de vente, si sous 10 jours ouvrés le matériel n'est pas restitué, vous devrez vous acquitter de 600 euros de frais.\n\n"
                                    . "Pour rendre le matériel, merci de prendre contact avec notre société au plus vite.\n\n"
                                    . "Cordialement,\nL'équipe de Julie";
-                    
-                    // Décommente la ligne ci-dessous en production si ton serveur gère l'envoi de mail standard :
-                    // mail($to, $subject, $email_content, "From: no-reply@viteetgourmand.com");
                     
                     $message .= " Envoi du mail de relance matériel simulé avec succès à " . htmlspecialchars($to) . ".";
                 }

@@ -86,8 +86,6 @@ include '../includes/header.php';
                                                     $galerie_images = !empty($m['galerie']) ? explode('|', $m['galerie']) : [];
                                                     $image_vignette = !empty($galerie_images[0]) ? $galerie_images[0] : 'assets/images/pizza-placeholder.jpg';
                                                     
-                                                    // AJUSTEMENT DU CHEMIN POUR LE SOUS-DOSSIER EMPLOYE
-                                                    // Si le chemin ne commence pas déjà par http ou par ../, on rajoute ../
                                                     $chemin_image_vignette = "../" . $image_vignette;
                                                 ?>
                                                 <img src="<?= htmlspecialchars($chemin_image_vignette) ?>" 

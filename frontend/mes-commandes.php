@@ -14,7 +14,7 @@ $commandes = $stmt->fetchAll();
 ?>
 
 <main class="container py-5">
-    <h2 class="mb-4">Mes Commandes 📦</h2>
+    <h2 class="mb-4">Mes Commandes </h2>
 
     <?php if (empty($commandes)): ?>
         <div class="alert alert-light border shadow-sm">

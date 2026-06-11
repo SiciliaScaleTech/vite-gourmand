@@ -5,7 +5,6 @@
     width: 100%;
 }
 
-/* Optionnel : petit effet au survol pour rendre le site vivant */
 .card-hover {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }

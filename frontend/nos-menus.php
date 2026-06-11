@@ -17,7 +17,6 @@ $n_prie = $_SESSION['f_pers'] ?? '';
 $a_prie = $_SESSION['f_aller'] ?? '';
 
 try {
-    // Vérifie bien que 'allergene' existe dans ta table 'menu' en BDD
     $query = $pdo->query("SELECT * FROM menu ORDER BY id ASC");
     $menus = $query->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -113,7 +112,7 @@ try {
         </div>
 
         <div id="no-result-message" class="text-center py-5" style="display: none;">
-            <div class="display-1">🍽️</div>
+            <div class="display-1"></div>
             <h3 class="mt-3 fw-bold text-muted">Aucun menu ne correspond à vos critères</h3>
             <p class="text-secondary">Essayez de modifier vos filtres pour voir plus de délices !</p>
         </div>
@@ -254,6 +253,6 @@ $menus_details = [
 </div>
 <?php endforeach; ?>
 
-<script src="<?= $prefixe ?>styles/script/nos-menus.js"></script>
+<script src="<?=$prefixe?>styles/script/nos-menus.js"></script>
 </body>
 </html>

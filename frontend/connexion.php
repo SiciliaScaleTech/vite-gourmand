@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once '../backend/config.php'; // Remonte d'un cran vers le dossier backend
+require_once '../backend/config.php'; 
 
 $erreur = "";
 
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    // 💡 Ajout du contournement de test (accepte admin123 en clair ou haché)
+    // Ajout du contournement de test (accepte admin123 en clair ou haché)
     if ($user && ($password === 'admin123' || password_verify($password, $user['mot_de_passe']))) {
         // Connexion réussie ! On stocke les infos en session
         $_SESSION['user_id'] = $user['id'];
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_prenom'] = $user['prenom'];
         $_SESSION['user_role'] = strtolower($user['role']); 
         
-        // 🔄 REDIRECTION CORRIGÉE (Basée sur l'image image_d50994.png)
+        
         if ($_SESSION['user_role'] === 'admin') {
             header("Location: admin/admin-dashboard.php");
             exit();
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: employe/employe-dashboard.php");
             exit();
         } else {
-            header("Location: ../index.php"); // Si index.php est à la racine du projet complet
+            header("Location: index.php"); 
             exit();
         }
     } else {

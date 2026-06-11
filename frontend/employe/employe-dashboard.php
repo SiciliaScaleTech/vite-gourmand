@@ -2,13 +2,13 @@
 session_start();
 require_once '../../backend/config.php';
 
-// 1. 🛡️ SÉCURITÉ STRICTE
+// 1. SÉCURITÉ STRICTE
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
     header('Location: ../connexion.php');
     exit();
 }
 
-// 🎨 LE CODE COULEUR DES STATUTS (Classes Bootstrap)
+// LE CODE COULEUR DES STATUTS (Classes Bootstrap)
 $couleurs_statut = [
     'reçue' => 'bg-secondary text-white',
     'accepté' => 'bg-info text-dark',
@@ -63,18 +63,22 @@ include '../includes/header.php';
         
         <!-- Barre d'alignement horizontal pour le badge et les boutons -->
         <div class="d-flex align-items-center flex-wrap gap-2">
-            <span class="badge bg-dark px-3 py-2 me-2">Espace Julie</span>
+
+        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                <a href="../admin/admin-dashboard.php" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-2 fw-bold shadow-sm me-2">
+                    ⬅️ Retour Espace Admin
+                </a>
+            <?php endif; ?>
             
-            <!-- BOUTON GESTION DE LA CARTE -->
             <a href="employe-carte.php" class="btn btn-sm btn-dark border-0 rounded-pill px-3 py-2 fw-bold shadow-sm">
                 Gestion de la Carte
             </a>
 
-            <!-- BOUTON GESTION DES AVIS -->
             <a href="employe-avis.php" class="btn btn-sm btn-warning border-0 rounded-pill px-3 py-2 fw-bold shadow-sm text-dark">
                 Gérer les Avis Clients
             </a>
         </div>
+    </div>
     </div>
 
     <?php if (isset($_GET['msg']) && $_GET['msg'] === 'deleted'): ?>

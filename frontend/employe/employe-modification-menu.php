@@ -2,8 +2,7 @@
 session_start();
 require_once '../../backend/config.php';
 
-// 1. SÉCURITÉ : Vérifier si l'utilisateur est connecté et est bien un employé
-// (Adapte la clé de session selon ton système de connexion)
+// 1. SÉCURITÉ : Vérifier si l'utilisateur est connecté et est bien un employé ou un admin
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'] ?? '', ['employe', 'admin'])) {
     header('Location: login.php');
     exit();
@@ -33,7 +32,6 @@ try {
 
 // 3. TRAITEMENT DU FORMULAIRE LORS DE LA SOUMISSION (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Récupération et sécurisation des données saisies
     $prix = floatval($_POST['prix_pers']);
     $stock = intval($_POST['stock']);
     $description = trim($_POST['description']);

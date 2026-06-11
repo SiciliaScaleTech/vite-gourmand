@@ -18,7 +18,6 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             }
         }
     }
-    // On recharge la page pour valider les calculs et "nettoyer" l'URL des paramètres GET
     header("Location: panier.php");
     exit();
 }

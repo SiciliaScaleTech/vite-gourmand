@@ -32,7 +32,7 @@
                         </div>
                         <div>
                             <p class="mb-0 small text-muted">Email</p>
-                            <p class="fw-bold mb-0">julie@vite-gourmand.fr</p>
+                            <p class="fw-bold mb-0">tourysicili@gmail.com</p>
                         </div>
                     </div>
                 </div>
