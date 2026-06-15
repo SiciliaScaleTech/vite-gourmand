@@ -38,13 +38,15 @@ $avis_en_attente = $stmt->fetchAll(PDO::FETCH_ASSOC);
 include '../includes/header.php';
 ?>
 
-<main class="container py-5">
+<main class="container py-4 py-md-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
             
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="employe-dashboard.php" class="btn btn-outline-secondary rounded-pill">⬅️ Retour au Tableau de bord</a>
-                <h2>Modération des Avis Clients</h2>
+            <div class="d-flex flex-column-reverse flex-md-row justify-content-between align-items-stretch align-items-md-center mb-4 gap-3">
+                <a href="employe-dashboard.php" class="btn btn-outline-secondary rounded-pill btn-sm py-2 px-3 text-center" style="font-size: 0.85rem;">
+                    ⬅️ Retour au Tableau de bord
+                </a>
+                <h2 class="mb-0 fw-bold fs-3 fs-md-2 text-md-end">Modération des Avis Clients</h2>
             </div>
 
             <?= $message ?>

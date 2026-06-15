@@ -44,18 +44,17 @@ include '../includes/header.php';
 <main class="container py-5">
     <div class="row">
         
-        <div class="col-12 mb-4 d-flex justify-content-between align-items-center border-bottom pb-3">
-            <div>
-                <a href="employe-dashboard.php" class="btn btn-outline-secondary rounded-pill btn-sm mb-2">⬅️ Retour au Dashboard</a>
-                <h2 class="mb-0 fw-bold">Gestion de la Carte (Menus & Plats)</h2>
+        <div class="col-12 mb-4 border-bottom pb-3 carte-header">
+            <div class="header-titre-bloc">
+                <a href="employe-dashboard.php" class="btn btn-outline-secondary rounded-pill btn-sm btn-retour">⬅️ Retour</a>
+                <h2 class="fw-bold titre-page">Gestion de la Carte</h2>
             </div>
-            <a href="employe-ajouter-menu.php" class="btn btn-success rounded-pill fw-bold shadow-sm">+ Ajouter un menu / plat</a>
+            
+            <a href="employe-ajouter-menu.php" class="btn btn-success rounded-pill fw-bold shadow-sm btn-ajouter">+ Ajouter un menu / plat</a>
         </div>
-
-        <?= $message ?>
-
+        
         <div class="col-12">
-            <div class="card shadow border-0 mb-4">
+            <div class="card shadow border-0 mb-4 d-none d-lg-block">
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
@@ -85,7 +84,6 @@ include '../includes/header.php';
                                                 <?php 
                                                     $galerie_images = !empty($m['galerie']) ? explode('|', $m['galerie']) : [];
                                                     $image_vignette = !empty($galerie_images[0]) ? $galerie_images[0] : 'assets/images/pizza-placeholder.jpg';
-                                                    
                                                     $chemin_image_vignette = "../" . $image_vignette;
                                                 ?>
                                                 <img src="<?= htmlspecialchars($chemin_image_vignette) ?>" 
@@ -135,6 +133,73 @@ include '../includes/header.php';
                         </table>
                     </div>
                 </div>
+            </div>
+
+            <div class="d-block d-lg-none">
+                <?php if (empty($menus)): ?>
+                    <div class="card shadow border-0 p-4 text-center text-muted">
+                        <p class="fs-5 mb-1">La carte est vide</p>
+                        <p class="small mb-0">Clique sur "Ajouter un menu / plat" pour commencer.</p>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($menus as $m): ?>
+                        <?php 
+                            $galerie_images = !empty($m['galerie']) ? explode('|', $m['galerie']) : [];
+                            $image_vignette = !empty($galerie_images[0]) ? $galerie_images[0] : 'assets/images/pizza-placeholder.jpg';
+                            $chemin_image_vignette = "../" . $image_vignette;
+                        ?>
+                        <div class="card shadow border-0 mb-3 overflow-hidden">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start mb-3">
+                                    <img src="<?= htmlspecialchars($chemin_image_vignette) ?>" 
+                                         alt="<?= htmlspecialchars($m['titre']) ?>" 
+                                         class="rounded me-3 shadow-sm" 
+                                         style="width: 65px; height: 65px; object-fit: cover;">
+                                    
+                                    <div class="flex-grow-1">
+                                        <h5 class="fw-bold text-dark mb-1 fs-6"><?= htmlspecialchars($m['titre']) ?></h5>
+                                        <div class="mb-1">
+                                            <span class="badge bg-secondary text-capitalize py-1 px-2 small" style="font-size: 11px;"><?= htmlspecialchars($m['categorie']) ?></span>
+                                            <span class="fw-bold text-success ms-2" style="font-size: 14px;"><?= number_format($m['prix_pers'], 2, ',', ' ') ?> €</span>
+                                        </div>
+                                        <small class="text-muted d-block" style="font-size: 11px;">Tech : <?= htmlspecialchars($m['nom_technique'] ?? '') ?></small>
+                                    </div>
+                                </div>
+
+                                <p class="mb-2 text-dark bg-light p-2 rounded small" style="font-size: 13px; line-height: 1.4;">
+                                    <strong>Description :</strong><br>
+                                    <?= htmlspecialchars($m['description'] ?? 'Aucune description.') ?>
+                                </p>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <?php if(!empty($m['allergene']) && strtolower($m['allergene']) !== 'neant'): ?>
+                                            <span class="text-danger fw-bold d-block" style="font-size: 12px;">⚠️ <?= htmlspecialchars($m['allergene']) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div>
+                                        <?php if (($m['stock'] ?? 0) <= 0): ?>
+                                            <span class="badge bg-danger">Épuisé (0)</span>
+                                        <?php elseif (($m['stock'] ?? 0) <= 5): ?>
+                                            <span class="badge bg-warning text-dark">Faible (<?= htmlspecialchars($m['stock']) ?>)</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-success">Stock : <?= htmlspecialchars($m['stock']) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <a href="employe-modification-menu.php?id=<?= $m['id'] ?>" class="btn btn-sm btn-outline-dark rounded-pill w-50 py-2">Modifier</a>
+                                    <a href="employe-carte.php?delete_id=<?= $m['id'] ?>" 
+                                       class="btn btn-sm btn-danger rounded-pill w-50 py-2" 
+                                       onclick="return confirm('Supprimer définitivement le menu « <?= htmlspecialchars($m['titre']) ?> » ?');">
+                                        Supprimer
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
 

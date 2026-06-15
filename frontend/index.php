@@ -15,13 +15,18 @@ $avis_valides = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php include 'includes/header.php'; ?>
 
     <main>
-        <section class="hero-banner text-center">
-            <div class="container">
-                <h1 class="display-3 fw-bold">Vite & Gourmand</h1>
-                <p class="fs-4">L'excellence culinaire à votre porte.</p>
-                <a href="nos-menus.php" class="btn btn-cheddar btn-lg px-5 py-3 rounded-pill fw-bold">Commander maintenant</a>
-            </div>
-        </section>
+    <section class="hero-banner text-center py-5">
+        <div class="container my-auto">
+            <h1 class="display-5 display-md-3 fw-bold mb-3">Vite & Gourmand</h1>
+            
+            <p class="fs-5 fs-md-4 mb-4">L'excellence culinaire à votre porte.</p>
+            
+            <a href="nos-menus.php" class="btn btn-cheddar btn-lg px-4 px-md-5 py-2 py-md-3 rounded-pill fw-bold w-100 w-sm-auto">
+                Commander maintenant
+            </a>
+        </div>
+    </section>
+</main>
 
         <section class="py-5 bg-white">
             <div class="container">

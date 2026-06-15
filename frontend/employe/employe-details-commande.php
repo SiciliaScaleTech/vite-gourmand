@@ -170,18 +170,18 @@ include '../includes/header.php';
             <form method="POST" class="row g-3">
                 
                 <div class="col-12">
-                    <label class="form-label fw-bold">Sélectionnez le nouveau statut :</label>
-                    <select name="statut" id="statutSelect" class="form-select form-select-lg border-2" onchange="toggleAnnulationBlock()">
-                        <option value="reçue" <?= $commande['statut'] === 'reçue' ? 'selected' : '' ?>>Reçue (En attente de validation)</option>
-                        <option value="accepté" <?= $commande['statut'] === 'accepté' ? 'selected' : '' ?>>Accepté (Valide la commande & déduit les stocks)</option>
-                        <option value="en préparation" <?= $commande['statut'] === 'en préparation' ? 'selected' : '' ?>>En préparation (En cuisine)</option>
-                        <option value="en cours de livraison" <?= $commande['statut'] === 'en cours de livraison' ? 'selected' : '' ?>>En cours de livraison (Logistique Julie)</option>
-                        <option value="livré" <?= $commande['statut'] === 'livré' ? 'selected' : '' ?>>Livré (Remis au client)</option>
-                        <option value="en attente du retour de matériel" <?= $commande['statut'] === 'en attente du retour de matériel' ? 'selected' : '' ?>>En attente du retour de matériel (Alerte mail sous 10j - Frais 600€)</option>
-                        <option value="terminée" <?= $commande['statut'] === 'terminée' ? 'selected' : '' ?>>Terminée</option>
-                        <option value="annulée" <?= $commande['statut'] === 'annulée' ? 'selected' : '' ?>>Annulée</option>
-                    </select>
-                </div>
+    <label class="form-label fw-bold">Sélectionnez le nouveau statut :</label>
+    <select name="statut" id="statutSelect" class="form-select form-select-lg border-2" onchange="toggleAnnulationBlock()">
+        <option value="reçue" <?= $commande['statut'] === 'reçue' ? 'selected' : '' ?>>Reçue (En attente)</option>
+        <option value="accepté" <?= $commande['statut'] === 'accepté' ? 'selected' : '' ?>>Accepté (Stocks déduits)</option>
+        <option value="en préparation" <?= $commande['statut'] === 'en préparation' ? 'selected' : '' ?>>En préparation</option>
+        <option value="en cours de livraison" <?= $commande['statut'] === 'en cours de livraison' ? 'selected' : '' ?>>En cours de livraison (Julie)</option>
+        <option value="livré" <?= $commande['statut'] === 'livré' ? 'selected' : '' ?>>Livré</option>
+        <option value="en attente du retour de matériel" <?= $commande['statut'] === 'en attente du retour de matériel' ? 'selected' : '' ?>>Attente matériel (Frais 600€)</option>
+        <option value="terminée" <?= $commande['statut'] === 'terminée' ? 'selected' : '' ?>>Terminée</option>
+        <option value="annulée" <?= $commande['statut'] === 'annulée' ? 'selected' : '' ?>>Annulée</option>
+    </select>
+</div>
 
                 <div id="blocAnnulation" class="col-12 d-none">
                     <div class="card border-danger bg-light-danger p-3 rounded-3">

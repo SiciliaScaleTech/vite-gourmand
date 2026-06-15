@@ -117,24 +117,22 @@ $prefix = "../";
 include '../includes/header.php';
 ?>
 
-<main class="container py-5">
-    <!-- En-tête -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+<main class="container py-4 py-md-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mb-4 mb-md-5 border-bottom pb-3">
         <div>
-            <h1 class="fw-bold mb-1">Espace Administrateur</h1>
-            <p class="text-muted mb-0">Gestion du personnel et analyse de l'activité</p>
+            <h1 class="fw-bold mb-1 fs-2 fs-md-1">Espace Administrateur</h1>
+            <p class="text-muted mb-0 small">Gestion du personnel et analyse de l'activité</p>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="../employe/employe-dashboard.php" class="btn btn-outline-dark rounded-pill px-3 fw-bold">
+        <div class="d-flex flex-column flex-sm-row gap-2">
+            <a href="../employe/employe-dashboard.php" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-2 fw-bold text-center">
                 Gérer les Commandes (Vue Employé)
             </a>
-            <a href="#statsSection" class="btn btn-primary border-0 rounded-pill px-3 fw-bold shadow-sm">
+            <a href="#statsSection" class="btn btn-sm btn-primary border-0 rounded-pill px-3 py-2 fw-bold shadow-sm text-center">
                 Voir les Graphiques & CA
             </a>
         </div>
     </div>
 
-    <!-- Alertes -->
     <?php if (!empty($message)): ?>
         <div class="alert <?= $messageClass ?> alert-dismissible fade show fw-bold mb-4" role="alert">
             <?= $message ?>
@@ -150,25 +148,24 @@ include '../includes/header.php';
     <?php endif; ?>
 
     <div class="row g-4">
-        <!-- Formulaire création -->
         <div class="col-lg-5">
-            <div class="card shadow border-0 rounded-4 p-4">
-                <h4 class="fw-bold text-dark mb-3">Créer un compte Employé</h4>
+            <div class="card shadow border-0 rounded-4 p-3 p-md-4">
+                <h4 class="fw-bold text-dark mb-3 fs-5">Créer un compte Employé</h4>
                 <form method="POST" action="">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Prénom</label>
+                        <label class="form-label fw-bold small">Prénom</label>
                         <input type="text" name="prenom" class="form-control" placeholder="Ex: Jean" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Nom</label>
+                        <label class="form-label fw-bold small">Nom</label>
                         <input type="text" name="nom" class="form-control" placeholder="Ex: Dupont" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Adresse Email</label>
+                        <label class="form-label fw-bold small">Adresse Email</label>
                         <input type="email" name="email" class="form-control" placeholder="employe@viteetgourmand.fr" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Mot de passe initial</label>
+                        <label class="form-label fw-bold small">Mot de passe initial</label>
                         <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                     </div>
                     <button type="submit" name="creer_employe" class="btn btn-dark w-100 rounded-pill fw-bold py-2 mt-2">
@@ -178,14 +175,14 @@ include '../includes/header.php';
             </div>
         </div>
 
-        <!-- Tableau employés -->
         <div class="col-lg-7">
             <div class="card shadow border-0 rounded-4 overflow-hidden h-100">
                 <div class="card-header bg-dark text-white p-3">
-                    <h5 class="mb-0 fw-bold py-1">Comptes Employés existants</h5>
+                    <h5 class="mb-0 fw-bold py-1 fs-6">Comptes Employés existants</h5>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
+                    
+                    <div class="table-responsive d-none d-md-block">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
@@ -223,41 +220,61 @@ include '../includes/header.php';
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="d-block d-md-none p-3">
+                        <?php if (empty($employes)): ?>
+                            <div class="text-center text-muted py-3">Aucun employé enregistré.</div>
+                        <?php else: ?>
+                            <?php foreach ($employes as $emp): ?>
+                                <div class="p-3 mb-2 border rounded-3 bg-white shadow-sm">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-bold text-dark"><?= htmlspecialchars($emp['prenom'] . ' ' . $emp['nom']) ?></span>
+                                        <span class="badge bg-<?= $emp['actif'] == 1 ? 'success' : 'danger' ?> small">
+                                            <?= $emp['actif'] == 1 ? 'Actif' : 'Désactivé' ?>
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mb-3"><?= htmlspecialchars($emp['email']) ?></div>
+                                    <a href="admin-dashboard.php?action=<?= $emp['actif'] == 1 ? 'desactiver' : 'activer' ?>&id_user=<?= $emp['id'] ?>" 
+                                       class="btn btn-sm btn-outline-<?= $emp['actif'] == 1 ? 'danger' : 'success' ?> w-100 rounded-pill py-2"
+                                       onclick="return confirm('Confirmer l\'action sur ce compte ?');">
+                                        <?= $emp['actif'] == 1 ? '🔒 Bloquer le compte' : '🔓 Réactiver le compte' ?>
+                                    </a>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- STATISTIQUES -->
-    <div id="statsSection" class="mt-5 pt-4">
-        <hr class="my-5">
+    <div id="statsSection" class="mt-5 pt-2">
+        <hr class="my-4 my-md-5">
         
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mb-4">
             <div>
-                <h3 class="fw-bold text-dark mb-1">Analyse des Ventes & Chiffre d'Affaires</h3>
+                <h3 class="fw-bold text-dark mb-1 fs-4">Analyse des Ventes & CA</h3>
             </div>
             
-            <!-- AJOUT DE ID "affichage-ca" POUR LE JAVASCRIPT -->
-            <div class="bg-success text-white px-4 py-3 rounded-4 shadow-sm text-center">
-                <span class="text-uppercase small fw-bold d-block opacity-75">Chiffre d'Affaires</span>
+            <div class="bg-success text-white px-4 py-3 rounded-4 shadow-sm text-center w-100 w-md-auto">
+                <span class="text-uppercase small fw-bold d-block opacity-75" style="font-size: 0.75rem;">Chiffre d'Affaires</span>
                 <span class="fs-3 fw-bold" id="affichage-ca"><?= number_format($chiffre_affaires, 2, ',', ' ') ?> €</span>
             </div>
         </div>
 
-        <!-- AJOUT DE ID "formFiltre", "date_debut" ET "date_fin" POUR CAPTURER L'ÉVÉNEMENT JS -->
-        <div class="card shadow border-0 rounded-4 p-4 mb-4 bg-light">
+        <div class="card shadow border-0 rounded-4 p-3 p-md-4 mb-4 bg-light">
             <form method="GET" action="admin-dashboard.php#statsSection" id="formFiltre" class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-sm-6 col-md-4">
                     <label class="form-label fw-bold small text-muted">Date de début</label>
                     <input type="date" name="date_debut" id="date_debut" class="form-control" value="<?= htmlspecialchars($date_debut) ?>">
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-6 col-md-4">
                     <label class="form-label fw-bold small text-muted">Date de fin</label>
                     <input type="date" name="date_fin" id="date_fin" class="form-control" value="<?= htmlspecialchars($date_fin) ?>">
                 </div>
-                <div class="col-md-4 d-flex gap-2">
+                <div class="col-12 col-md-4 d-flex gap-2">
                     <button type="submit" class="btn btn-dark w-100 rounded-pill fw-bold py-2">Filtrer</button>
-                    <!--  CORRECTION DE $date_end PAR $date_fin -->
                     <?php if(!empty($date_debut) || !empty($date_fin)): ?>
                         <a href="admin-dashboard.php#statsSection" class="btn btn-outline-secondary rounded-pill fw-bold py-2">Réinitialiser</a>
                     <?php endif; ?>
@@ -266,10 +283,10 @@ include '../includes/header.php';
         </div>
 
         <div class="row">
-            <div class="col-10 col-md-8 mx-auto">
-                <div class="card shadow border-0 rounded-4 p-4 text-center">
-                    <h5 class="fw-bold text-dark mb-4">Volume des ventes par menu</h5>
-                    <div style="position: relative; height:300px; width:100%">
+            <div class="col-12 col-md-10 mx-auto">
+                <div class="card shadow border-0 rounded-4 p-3 p-md-4 text-center">
+                    <h5 class="fw-bold text-dark mb-3 mb-md-4 fs-6">Volume des ventes par menu</h5>
+                    <div style="position: relative; height:260px; width:100%">
                         <canvas id="chartMenus"></canvas>
                     </div>
                 </div>
@@ -278,7 +295,6 @@ include '../includes/header.php';
     </div>
 </main>
 
-<!--  TRANSMISSION DES VARIABLES PHP INITIALES VERS JS -->
 <script>
     const labelsMenus = <?= json_encode($labels_graphique) ?>;
     const donneesVentes = <?= json_encode($donnees_graphique) ?>;

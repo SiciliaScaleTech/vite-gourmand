@@ -67,7 +67,7 @@ include 'includes/header.php';
     </div>
 <?php else: ?>
     
-        <div class="table-responsive">
+      <div class="table-responsive">
             <table class="table align-middle">
                 <thead class="table-light">
                     <tr>
@@ -81,15 +81,17 @@ include 'includes/header.php';
                 <tbody>
                     <?php foreach ($panier_details as $item): ?>
                     <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
+                        <td data-label="Menu">
+                            <div class="d-flex align-items-center justify-content-md-start justify-content-end">
                                 <img src="assets/<?= $item['img'] ?>" alt="<?= $item['titre'] ?>" style="width: 50px; height: 50px; object-fit: cover;" class="rounded me-3">
                                 <span class="fw-bold"><?= $item['titre'] ?></span>
                             </div>
                         </td>
-                        <td><?= number_format($item['prix'], 2) ?> €</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-3">
+                        
+                        <td data-label="Prix Unitaire"><?= number_format($item['prix'], 2) ?> €</td>
+                        
+                        <td data-label="Quantité">
+                            <div class="d-flex align-items-center justify-content-md-start justify-content-end gap-3">
                                 <a href="panier.php?id=<?= $item['id'] ?>&action=diminuer" 
                                 class="btn btn-sm btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" 
                                 style="width: 28px; height: 28px; text-decoration: none;">
@@ -107,20 +109,23 @@ include 'includes/header.php';
                                 </a>
                             </div>
                         </td>
-                        <td class="fw-bold"><?= number_format($item['sous_total'], 2) ?> €</td>
-                        <td>
-                            <a href="supprimer-item.php?id=<?= $item['id'] ?>" class="text-danger"onclick="return confirm('Voulez-vous vraiment supprimer ce menu ?')">🗑️</a>
+                        
+                        <td data-label="Sous-total" class="fw-bold"><?= number_format($item['sous_total'], 2) ?> €</td>
+                        
+                        <td data-label="Action">
+                            <a href="supprimer-item.php?id=<?= $item['id'] ?>" class="text-danger" onclick="return confirm('Voulez-vous vraiment supprimer ce menu ?')">🗑️</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr class="table-light">
-                        <td colspan="3" class="text-end fw-bold fs-5">Total Général :</td>
-                        <td colspan="2" class="text-primary fw-bold fs-5"><?= number_format($total_general, 2) ?> €</td>
+                        <td colspan="3" class="text-end fw-bold fs-5 d-none d-md-table-cell">Total Général :</td>
+                        <td colspan="2" class="text-primary fw-bold fs-5 text-end"><?= number_format($total_general, 2) ?> €</td>
                     </tr>
                 </tfoot>
             </table>
+        </div>
         </div>
         <div class="alert alert-info d-inline-block mt-2 border-0 shadow-sm">
             <i class="bi bi-info-circle-fill me-2"></i> 

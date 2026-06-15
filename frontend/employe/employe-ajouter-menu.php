@@ -87,9 +87,9 @@ include '../includes/header.php';
     <div class="row justify-content-center">
         <div class="col-md-8">
             
-            <div class="d-flex align-items-center mb-4">
-                <a href="employe-carte.php" class="btn btn-outline-secondary rounded-pill btn-sm me-3">⬅️ Annuler</a>
-                <h2 class="mb-0 fw-bold">Ajouter un nouveau menu</h2>
+            <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center mb-4 gap-2">
+                <a href="employe-carte.php" class="btn btn-outline-secondary rounded-pill btn-sm" style="font-size: 0.75rem;">⬅️ Annuler</a>
+                <h2 class="mb-0 fw-bold fs-4 fs-sm-2">Ajouter un nouveau menu</h2>
             </div>
 
             <?= $message ?>
@@ -171,7 +171,7 @@ include '../includes/header.php';
                             </div>
 
                             <div class="col-12 text-end mt-4">
-                                <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold px-5 shadow-sm">Enregistrer le menu</button>
+                                <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold px-5 shadow-sm btn-enregistrer">Enregistrer le menu</button>
                             </div>
 
                         </div>

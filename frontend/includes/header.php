@@ -27,6 +27,7 @@ $prefixe = ($dossier_actuel === 'employe' || $dossier_actuel === 'admin') ? '../
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= $prefixe ?>styles/css/style.css">
     <link rel="stylesheet" href="<?= $prefixe ?>styles/css/nos-menus.css">
+    <link rel="stylesheet" href="<?= $prefixe ?>styles/css/juridique.css">
 </head>
 <body>
     <header class="navbar-custom sticky-top shadow-sm">

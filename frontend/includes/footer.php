@@ -31,15 +31,16 @@
             <div class="col-md-3">
                 <h6 class="fw-bold text-white mb-3">Informations</h6>
                 <ul class="list-unstyled d-flex flex-column gap-2">
-                    <li><a href="#" class="text-white-50 text-decoration-none small">Mentions Légales</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none small">Politique de cookies</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none small">CGU</a></li>
+                    <li><a href="mentions_legales.php" class="text-white-50 text-decoration-none small">Mentions Légales</a></li>
+                    <li><a href="politique_confidentialite.php" class="text-white-50 text-decoration-none small">Politique de confidentialité</a></li>
+                    <li><a href="CGU.php" class="text-white-50 text-decoration-none small">CGU</a></li>
                 </ul>
             </div>
 
             <div class="col-md-3 text-secondary small">
                 <h6 class="fw-bold text-white mb-3">Contact</h6>
-                <p class="mb-1">julie@vite-gourmand.fr</p>
+                <p class="mb-1">tourysicilia@gmail.com</p>
+                <p> Julie : 06.58.69.84.57</p>
                 <p> José : 06.69.25.58.47</p>
             </div>
         </div>
