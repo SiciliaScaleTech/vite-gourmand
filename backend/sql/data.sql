@@ -1,9 +1,9 @@
 INSERT INTO utilisateurs (id, nom, prenom, email, telephone, mot_de_passe, role, date_inscription, adresse, ville, code_postal, actif) VALUES 
 -- 1. L'Admin 
-(13, 'Santos', 'José', 'tourysicilia91@gmail.com', NULL, '$2y$10$w3eXvX9A0p2A4e/Tqg2n7eCgC5xclVqB9zX6D2mZ9h7...', 'admin', '2026-06-10 11:05:59', NULL, NULL, NULL, 1),
+(13, 'Santos', 'José', 'jose.santos@gmail.com', NULL, '$2y$10$w3eXvX9A0p2A4e/Tqg2n7eCgC5xclVqB9zX6D2mZ9h7...', 'admin', '2026-06-10 11:05:59', NULL, NULL, NULL, 1),
 
 -- 2. L'Employé 
-(1, 'Latoure', 'Julie', 'Tourysicilia@gmail.com', '0623762077', '$2y$10$mQKTs4stKFuT6z7dFVVEtekdwzYeU98d4Oakyjs.aGW...', 'employe', NULL, '12 rue de la paix', 'bordeaux', '33000', 1),
+(1, 'Latoure', 'Julie', 'julie.latoure@gmail.com', '0658569874', '$2y$10$mQKTs4stKFuT6z7dFVVEtekdwzYeU98d4Oakyjs.aGW...', 'employe', NULL, '12 rue de la paix', 'bordeaux', '33000', 1),
 
 -- 3. L'Utilisateur inscrit 
 (8, 'fuse', 'carole', 'fuse.carole@gmail.com', '0615457896', '$2y$10$YzpD9IMdL/oO4SGz2aygp.wCAaeOSCkPPkfrwW.A/Ry...', 'utilisateur', '2026-06-08 20:59:43', '12 rue de la paix', 'lieusaint', '77127', 1);

@@ -39,7 +39,7 @@
 
             <div class="col-md-3 text-secondary small">
                 <h6 class="fw-bold text-white mb-3">Contact</h6>
-                <p class="mb-1">tourysicilia@gmail.com</p>
+                <p class="mb-1">julie.latoure@gmail.com</p>
                 <p> Julie : 06.58.69.84.57</p>
                 <p> José : 06.69.25.58.47</p>
             </div>
